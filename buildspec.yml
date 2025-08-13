@@ -22,12 +22,5 @@ phases:
       - npm run build
   post_build:
     commands:
-      - echo "=== POST_BUILD PHASE STARTED ==="
-      - pwd
-      - ls -la
-      - if [ -d build ]; then echo "Build directory exists"; else echo "Build directory does NOT exist"; fi
-      - which aws || echo "AWS CLI not found"
-      - aws --version || echo "AWS CLI not working"
       - echo "Uploading to S3..."
       - aws s3 sync build/ s3://fryrank-app-spa-bucket/ --delete || echo "S3 sync failed"
-      - echo "=== POST_BUILD PHASE ENDED ==="
