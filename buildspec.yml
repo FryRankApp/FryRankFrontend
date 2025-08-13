@@ -8,12 +8,26 @@ phases:
       - npm ci
   build:
     commands:
+      # Fetch encrypted values from SSM Parameter Store
+      - echo "Fetching encrypted values from SSM..."
+      - REACT_APP_GOOGLE_API_KEY=$(aws ssm get-parameter --name "GOOGLE_API_KEY" --with-decryption --query "Parameter.Value" --output text)
+      - REACT_APP_GOOGLE_AUTH_KEY=$(aws ssm get-parameter --name "GOOGLE_AUTH_KEY" --with-decryption --query "Parameter.Value" --output text)
+      - REACT_APP_BACKEND_SERVICE_PATH=$(aws ssm get-parameter --name "BACKEND_SERVICE_PATH" --query "Parameter.Value" --output text)
+      # Create .env file with React environment variable names
+      - echo "REACT_APP_BACKEND_SERVICE_PATH=$REACT_APP_BACKEND_SERVICE_PATH" > .env
+      - echo "REACT_APP_GOOGLE_API_KEY=$REACT_APP_GOOGLE_API_KEY" >> .env
+      - echo "REACT_APP_GOOGLE_AUTH_KEY=$REACT_APP_GOOGLE_AUTH_KEY" >> .env
+      # Clear sensitive variables from shell
+      - unset REACT_APP_GOOGLE_API_KEY REACT_APP_GOOGLE_AUTH_KEY REACT_APP_BACKEND_SERVICE_PATH
       - npm run build
   post_build:
     commands:
-      - echo "Contents of root directory:"
+      - echo "=== POST_BUILD PHASE STARTED ==="
+      - pwd
       - ls -la
-      - echo "Contents of build directory:"
-      - ls -la build/
+      - if [ -d build ]; then echo "Build directory exists"; else echo "Build directory does NOT exist"; fi
+      - which aws || echo "AWS CLI not found"
+      - aws --version || echo "AWS CLI not working"
       - echo "Uploading to S3..."
-      - aws s3 sync build/ s3://fryrank-app-spa-bucket/ --delete
+      - aws s3 sync build/ s3://fryrank-app-spa-bucket/ --delete || echo "S3 sync failed"
+      - echo "=== POST_BUILD PHASE ENDED ==="
