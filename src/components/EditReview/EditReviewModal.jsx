@@ -20,7 +20,7 @@ export default function EditReviewModal({ modal, signIn, save, review }){
     const [errors, setErrors] = useState({});
     
     useEffect(() => {
-        setUpdatedReview(review); //makes sure the review contents prepopulates with the correct values
+        setUpdatedReview(review); // Makes sure the review contents prepopulates with the correct values
         setErrors({}); // Clear errors when review changes
     }, [review]);
 
@@ -41,7 +41,7 @@ export default function EditReviewModal({ modal, signIn, save, review }){
         const { name, value } = e.target; 
         setUpdatedReview(prevReview => ({ ...prevReview, [name]: value, }));
         
-        //Clear errors when user types in form fields.
+        // Clear errors when user types in form fields.
         if (errors[name]) {
             setErrors(prev => {
                 const newErrors = { ...prev };

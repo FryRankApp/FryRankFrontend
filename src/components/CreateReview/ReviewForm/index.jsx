@@ -18,7 +18,7 @@ const propTypes = {
 
 const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurrentReview, loggedIn, username, accountId }) => {
 
-    //Error handling and validation of review form inputs.
+    // Error handling and validation of review form inputs.
     const [errors, setErrors] = useState({});
 
     const validateForm = () => {
@@ -34,6 +34,13 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
         }
     };
 
+    const clearErrors = (errorToDelete) => {
+        setErrors(prev => {
+            const newErrors = { ...prev };
+            delete newErrors[errorToDelete];
+            return newErrors;
+        });
+    };
 
     return (
         <div>
@@ -45,13 +52,9 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
                 }
                 updateCurrentReview(event.target.name, event.target.value);
 
-                //Clear errors when user types in form fields.
+                // Clear errors when user types in form fields.
                 if (errors[event.target.name]) {
-                    setErrors(prev => {
-                        const newErrors = { ...prev };
-                        delete newErrors[event.target.name];
-                        return newErrors;
-                    });
+                    clearErrors(event.target.name);
                 }
             }}
         >
@@ -79,13 +82,9 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
                             }
                             updateCurrentReview(event.target.name, event.target.value);
 
-                            //Clear errors when user types in form fields.
+                            // Clear errors when user types in form fields.
                             if (errors[event.target.name]) {
-                                setErrors(prev => {
-                                    const newErrors = { ...prev };
-                                    delete newErrors[event.target.name];
-                                    return newErrors;
-                                });
+                                clearErrors(event.target.name);
                             }
                         }}
                     />
