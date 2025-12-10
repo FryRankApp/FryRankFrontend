@@ -6,26 +6,33 @@ phases:
       nodejs: 18
     commands:
       - npm ci
+
   build:
     commands:
-      # Fetch encrypted values from SSM Parameter Store
-      - echo "Fetching encrypted values from SSM..."
-      - REACT_APP_GOOGLE_API_KEY=$(aws ssm get-parameter --name "GOOGLE_API_KEY" --with-decryption --query "Parameter.Value" --output text)
-      - REACT_APP_GOOGLE_AUTH_KEY=$(aws ssm get-parameter --name "GOOGLE_AUTH_KEY" --with-decryption --query "Parameter.Value" --output text)
-      - REACT_APP_BACKEND_SERVICE_PATH=$(aws ssm get-parameter --name "BACKEND_SERVICE_PATH" --query "Parameter.Value" --output text)
-      # Create .env file with React environment variable names
-      - echo "REACT_APP_BACKEND_SERVICE_PATH=$REACT_APP_BACKEND_SERVICE_PATH" > .env
-      - echo "REACT_APP_GOOGLE_API_KEY=$REACT_APP_GOOGLE_API_KEY" >> .env
-      - echo "REACT_APP_GOOGLE_AUTH_KEY=$REACT_APP_GOOGLE_AUTH_KEY" >> .env
-      # Clear sensitive variables from shell
-      - unset REACT_APP_GOOGLE_API_KEY REACT_APP_GOOGLE_AUTH_KEY REACT_APP_BACKEND_SERVICE_PATH
-      - npm run build
+      - |
+        echo "Fetching encrypted values from SSM..."
+
+        REACT_APP_GOOGLE_API_KEY=$(aws ssm get-parameter --name "GOOGLE_API_KEY" --with-decryption --query "Parameter.Value" --output text)
+        REACT_APP_GOOGLE_AUTH_KEY=$(aws ssm get-parameter --name "GOOGLE_AUTH_KEY" --with-decryption --query "Parameter.Value" --output text)
+        REACT_APP_BACKEND_SERVICE_PATH=$(aws ssm get-parameter --name "BACKEND_SERVICE_PATH" --query "Parameter.Value" --output text)
+
+        echo "REACT_APP_BACKEND_SERVICE_PATH=$REACT_APP_BACKEND_SERVICE_PATH" > .env
+        echo "REACT_APP_GOOGLE_API_KEY=$REACT_APP_GOOGLE_API_KEY" >> .env
+        echo "REACT_APP_GOOGLE_AUTH_KEY=$REACT_APP_GOOGLE_AUTH_KEY" >> .env
+
+        unset REACT_APP_GOOGLE_API_KEY REACT_APP_GOOGLE_AUTH_KEY REACT_APP_BACKEND_SERVICE_PATH
+
+        npm run build
+
   post_build:
     commands:
-      - echo "Uploading to S3..."
-      # Determine current AWS account ID and construct bucket name dynamically
-      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-      - echo "Detected AWS Account ID: $ACCOUNT_ID"
-      - 'BUCKET_NAME="fryrank-app-spa-bucket-${ACCOUNT_ID}"'
-      - echo "Using bucket: s3://$BUCKET_NAME/"
-      - aws s3 sync build/ s3://$BUCKET_NAME/ --delete || echo "S3 sync failed"
+      - |
+        echo "Uploading to S3..."
+
+        ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+        echo "Detected AWS Account ID: $ACCOUNT_ID"
+
+        BUCKET_NAME="fryrank-app-spa-bucket-${ACCOUNT_ID}"
+        echo "Using bucket: s3://$BUCKET_NAME/"
+
+        aws s3 sync build/ s3://$BUCKET_NAME/ --delete || echo "S3 sync failed"
