@@ -23,4 +23,9 @@ phases:
   post_build:
     commands:
       - echo "Uploading to S3..."
-      - aws s3 sync build/ s3://fryrank-app-spa-bucket/ --delete || echo "S3 sync failed"
+      # Determine current AWS account ID and construct bucket name dynamically
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - echo "Detected AWS Account ID: $ACCOUNT_ID"
+      - 'BUCKET_NAME="fryrank-app-spa-bucket-${ACCOUNT_ID}"'
+      - echo "Using bucket: s3://$BUCKET_NAME/"
+      - aws s3 sync build/ s3://$BUCKET_NAME/ --delete || echo "S3 sync failed"
