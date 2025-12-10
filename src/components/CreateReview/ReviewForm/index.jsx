@@ -1,7 +1,8 @@
 import { PropTypes } from 'prop-types';
 import { Form, FormGroup, Input, Label } from 'reactstrap';
 
-import { Button, LinkButton, ScoreDropdown } from '../../Common';
+import { useState } from 'react';
+import { Button, LinkButton, ScoreDropdown, validateReview } from '../../Common';
 import FryposalLoginImage from "../../../Fryposal.png";
 import './style.css';
 
@@ -17,14 +18,41 @@ const propTypes = {
 
 const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurrentReview, loggedIn, username, accountId }) => {
 
+    //Error handling and validation of review form inputs.
+    const [errors, setErrors] = useState({});
+
+    const validateForm = () => {
+        const newErrors = validateReview(currentReview);
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        if (validateForm()) {
+            createReview(currentReview);
+        }
+    };
+
+
     return (
         <div>
         <Form
+            onSubmit={handleSubmit}
             onChange={(event) => {
                 if (!currentReview.accountId && accountId) {
                     updateCurrentReview('accountId', accountId);
                 }
                 updateCurrentReview(event.target.name, event.target.value);
+
+                //Clear errors when user types in form fields.
+                if (errors[event.target.name]) {
+                    setErrors(prev => {
+                        const newErrors = { ...prev };
+                        delete newErrors[event.target.name];
+                        return newErrors;
+                    });
+                }
             }}
         >
             {loggedIn &&
@@ -40,7 +68,29 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
                         disabled="true"
                     />
                 </FormGroup>
-                    <ScoreDropdown labelName="Score" name="score" id="scoreInput"/>
+                    <ScoreDropdown 
+                        labelName="Score" 
+                        name="score" 
+                        id="scoreInput"
+                        value={currentReview.score || ''}
+                        onChange={(event) => {
+                            if (!currentReview.accountId && accountId) {
+                                updateCurrentReview('accountId', accountId);
+                            }
+                            updateCurrentReview(event.target.name, event.target.value);
+
+                            //Clear errors when user types in form fields.
+                            if (errors[event.target.name]) {
+                                setErrors(prev => {
+                                    const newErrors = { ...prev };
+                                    delete newErrors[event.target.name];
+                                    return newErrors;
+                                });
+                            }
+                        }}
+                    />
+                    {errors.score && <p className="text-danger">{errors.score}</p>}
+                    
                     <FormGroup>
                         <Label for="titleInput">
                             Title
@@ -48,9 +98,12 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
                         <Input
                             id="titleInput"
                             name="title"
+                            value={currentReview.title || ''}
                             placeholder="A title for your review"
                             type="textarea"
+                            invalid={!!errors.title}
                         />
+                    {errors.title && <p className="text-danger">{errors.title}</p>}
                     </FormGroup>
                     <FormGroup>
                         <Label for="bodyInput">
@@ -59,17 +112,18 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
                         <Input
                             id="bodyInput"
                             name="body"
+                            value={currentReview.body || ''}
                             placeholder="Your review text here"
                             type="textarea"
+                            invalid={!!errors.body}
                         />
-                    </FormGroup></div>
+                    {errors.body && <p className="text-danger">{errors.body}</p>}
+                    </FormGroup></div>                
             }
             {loggedIn ? <Button
                 children='Submit'
                 color='danger'
-                onClick={(event) => {
-                    createReview(currentReview)
-                }}
+                type='submit'
             /> : <Button
                 children='Log in to Google to submit a review'
                 color='danger'

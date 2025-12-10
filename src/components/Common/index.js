@@ -10,3 +10,4 @@ export { default as ReviewCard } from './ReviewCard';
 export { default as ReviewCardList } from './ReviewCardList';
 export { default as Score } from "./Score";
 export { default as ScoreDropdown } from "./ScoreDropdown";
+export { validateReview, isReviewValid } from './reviewValidation';
