@@ -1,6 +1,6 @@
 /**
- * Removes the selected error from an errors object on a user form.
- * @param {Object} errors - The user form's errors object
+ * Removes the selected error from an errors object.
+ * @param {Object} errors - The errors object
  * @param {string} errorKey - The key of the error to remove
  * @returns {Object} The empty errors object to return.
  */
