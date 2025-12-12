@@ -3,6 +3,7 @@ import { Form, FormGroup, Input, Label } from 'reactstrap';
 
 import { useState } from 'react';
 import { Button, LinkButton, ScoreDropdown, validateReview } from '../../Common';
+import { clearError } from '../../../utils/errorUtils';
 import FryposalLoginImage from "../../../Fryposal.png";
 import './style.css';
 
@@ -34,13 +35,6 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
         }
     };
 
-    const clearErrors = (errorToDelete) => {
-        setErrors(prev => {
-            const newErrors = { ...prev };
-            delete newErrors[errorToDelete];
-            return newErrors;
-        });
-    };
 
     return (
         <div>
@@ -54,7 +48,7 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
 
                 // Clear errors when user types in form fields.
                 if (errors[event.target.name]) {
-                    clearErrors(event.target.name);
+                    setErrors(clearError(errors, event.target.name));
                 }
             }}
         >
@@ -84,7 +78,7 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
 
                             // Clear errors when user types in form fields.
                             if (errors[event.target.name]) {
-                                clearErrors(event.target.name);
+                                setErrors(clearError(errors, event.target.name));
                             }
                         }}
                     />

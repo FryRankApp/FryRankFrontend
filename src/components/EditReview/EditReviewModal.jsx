@@ -6,6 +6,7 @@ import { Input, Label, FormGroup } from 'reactstrap';
 import FryposalLoginImage from "../../Fryposal.png";
 import { PropTypes } from 'prop-types';
 import { ScoreDropdown, validateReview } from "../Common";
+import { clearError } from '../../utils/errorUtils';
 
 const propTypes = {
     modal: PropTypes.bool.isRequired,
@@ -43,11 +44,7 @@ export default function EditReviewModal({ modal, signIn, save, review }){
         
         // Clear errors when user types in form fields.
         if (errors[name]) {
-            setErrors(prev => {
-                const newErrors = { ...prev };
-                delete newErrors[name];
-                return newErrors;
-            });
+            setErrors(clearError(errors, name));
         }
     };
 
