@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Card, CardBody, CardTitle, Button } from 'reactstrap';
+import { donationsActions } from '../../redux/reducers/donations';
 import './style.css';
 
 const FRY_SIZES = [
@@ -8,38 +9,21 @@ const FRY_SIZES = [
     { id: 'large', name: 'Large Fries', price: 4, emoji: '🍟' }
 ];
 
-export default function Donate() {
-    const [cart, setCart] = useState([]);
-    const [showCheckout, setShowCheckout] = useState(false);
-    const [orderComplete, setOrderComplete] = useState(false);
+const Donate = () => {
+    const dispatch = useDispatch();
+    const { cart, showCheckout, orderComplete } = useSelector(state => state.donationsReducer);
 
     const addToCart = (frySize) => {
-        const existingItem = cart.find(item => item.id === frySize.id);
-        if (existingItem) {
-            setCart(cart.map(item =>
-                item.id === frySize.id
-                    ? { ...item, quantity: item.quantity + 1 }
-                    : item
-            ));
-        } else {
-            setCart([...cart, { ...frySize, quantity: 1 }]);
-        }
+        dispatch(donationsActions.addToCart(frySize));
     };
 
     const removeFromCart = (fryId) => {
-        setCart(cart.filter(item => item.id !== fryId));
+        dispatch(donationsActions.removeFromCart(fryId));
     };
 
     const updateQuantity = (fryId, newQuantity) => {
-        if (newQuantity <= 0) {
-            removeFromCart(fryId);
-        } else {
-            setCart(cart.map(item =>
-                item.id === fryId
-                    ? { ...item, quantity: newQuantity }
-                    : item
-            ));
-        }
+        dispatch(donationsActions.updateQuantity(fryId, newQuantity));
+       
     };
 
     const getTotal = () => {
@@ -49,19 +33,20 @@ export default function Donate() {
     const handleCheckout = () => {
         // In a real implementation, this would connect to Stripe API
         // For now, we'll just simulate the checkout
-        setShowCheckout(true);
+        dispatch(donationsActions.startCheckout());
+        alert(cart,showCheckout, "stuff etc");
     };
 
     const handleCompleteOrder = () => {
         // Simulate order completion
         // In real implementation, this would process payment via Stripe
-        setOrderComplete(true);
-        setCart([]);
+        dispatch(donationsActions.completeOrder());
+        // Reset after 3 seconds
         setTimeout(() => {
-            setShowCheckout(false);
-            setOrderComplete(false);
+            dispatch(donationsActions.resetOrder());
         }, 3000);
     };
+
 
     if (showCheckout && !orderComplete) {
         return (
@@ -99,7 +84,7 @@ export default function Donate() {
                         <Button 
                             color="secondary" 
                             className="mt-3 ms-2"
-                            onClick={() => setShowCheckout(false)}
+                            onClick={() => dispatch(donationsActions.cancelCheckout())}
                         >
                             Back to Menu
                         </Button>
@@ -208,3 +193,4 @@ export default function Donate() {
     );
 }
 
+export default Donate;
