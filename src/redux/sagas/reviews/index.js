@@ -1,9 +1,10 @@
-import { put, takeEvery } from 'redux-saga/effects'
+import { put, takeEvery, call } from 'redux-saga/effects'
 import axios from 'axios';
 import _ from 'lodash';
 
 import { types, reviewsActions } from '../../reducers/reviews';
 import { BACKEND_SERVICE_PATH, AGGREGATE_INFORMATION_API_PATH, REVIEW_PROPERTY_ISO_DATE_TIME } from '../../../constants';
+import { generateToken } from "../../../utils/";
 
 const REVIEWS_API_PATH = `${BACKEND_SERVICE_PATH}/reviews`;
 
@@ -19,7 +20,8 @@ export function* callGetAllReviewsForRestaurant({ restaurantId }) {
 
 export function* callGetAllReviewsForAccount({ accountId }) {
     try {
-        const { data } = yield axios.get(REVIEWS_API_PATH, { params: { accountId } });
+        const token = yield call(generateToken, accountId);
+        const { data } = yield axios.get(REVIEWS_API_PATH, { params: { accountId: token } });
         yield put(reviewsActions.successfulGetAllReviewsForAccountRequest(data));
     } catch (err) {
         yield put(reviewsActions.failedGetAllReviewsForAccountRequest(err.response.data.message));
@@ -28,11 +30,15 @@ export function* callGetAllReviewsForAccount({ accountId }) {
 
 export function* callCreateReviewForRestaurant({ review }) {
     try {
+        const token = yield call(generateToken, review.accountId);
         review = {
             ...review,
-            [REVIEW_PROPERTY_ISO_DATE_TIME]: new Date().toISOString()
+            [REVIEW_PROPERTY_ISO_DATE_TIME]: new Date().toISOString(),
         };
-        yield axios.post(REVIEWS_API_PATH, review);
+        yield axios.post(REVIEWS_API_PATH, review,  {
+            headers: {
+                'Authorization': `Bearer ${token}`,  // Send JWT separately for authentication
+            }});
         yield put(reviewsActions.successfulCreateReviewForRestaurantRequest(review));
     } catch (err) {
         yield put(reviewsActions.failedCreateReviewForRestaurantRequest(err.response.data.message));
