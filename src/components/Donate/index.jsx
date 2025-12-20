@@ -34,7 +34,6 @@ const Donate = () => {
         // In a real implementation, this would connect to Stripe API
         // For now, we'll just simulate the checkout
         dispatch(donationsActions.startCheckout());
-        alert(cart,showCheckout, "stuff etc");
     };
 
     const handleCompleteOrder = () => {

@@ -47,7 +47,7 @@ export default function Header({loggedIn}) {
                         <NavItem>  
                             <NavLink>                      
                                 <Link to='/donate'>
-                                    <h4> Donations </h4>
+                                    <h4> Donate </h4>
                                 </Link> 
                             </NavLink>                         
                         </NavItem>
