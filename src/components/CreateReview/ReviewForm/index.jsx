@@ -1,9 +1,7 @@
 import { PropTypes } from 'prop-types';
 import { Form, FormGroup, Input, Label } from 'reactstrap';
 
-import { useState } from 'react';
 import { Button, LinkButton, ScoreDropdown, validateReview } from '../../Common';
-import { clearError } from '../../../utils/errorUtils';
 import FryposalLoginImage from "../../../Fryposal.png";
 import './style.css';
 
@@ -15,16 +13,16 @@ const propTypes = {
     loggedIn: PropTypes.bool.isRequired,
     username: PropTypes.string.isRequired,
     accountId: PropTypes.string.isRequired,
+    formErrors: PropTypes.object.isRequired,
+    setFormErrors: PropTypes.func.isRequired,
+    deleteFormError: PropTypes.func.isRequired,
 };
 
-const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurrentReview, loggedIn, username, accountId }) => {
-
-    // Error handling and validation of review form inputs.
-    const [errors, setErrors] = useState({});
+const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurrentReview, loggedIn, username, accountId, formErrors, setFormErrors, deleteFormError }) => {
 
     const validateForm = () => {
         const newErrors = validateReview(currentReview);
-        setErrors(newErrors);
+        setFormErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
@@ -47,8 +45,8 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
                 updateCurrentReview(event.target.name, event.target.value);
 
                 // Clear errors when user types in form fields.
-                if (errors[event.target.name]) {
-                    setErrors(clearError(errors, event.target.name));
+                if (formErrors[event.target.name]) {
+                    deleteFormError(event.target.name);
                 }
             }}
         >
@@ -77,12 +75,12 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
                             updateCurrentReview(event.target.name, event.target.value);
 
                             // Clear errors when user types in form fields.
-                            if (errors[event.target.name]) {
-                                setErrors(clearError(errors, event.target.name));
+                            if (formErrors[event.target.name]) {
+                                deleteFormError(event.target.name);
                             }
                         }}
                     />
-                    {errors.score && <p className="text-danger">{errors.score}</p>}
+                    {formErrors.score && <p className="text-danger">{formErrors.score}</p>}
                     
                     <FormGroup>
                         <Label for="titleInput">
@@ -94,9 +92,9 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
                             value={currentReview.title || ''}
                             placeholder="A title for your review"
                             type="textarea"
-                            invalid={!!errors.title}
+                            invalid={!!formErrors.title}
                         />
-                    {errors.title && <p className="text-danger">{errors.title}</p>}
+                    {formErrors.title && <p className="text-danger">{formErrors.title}</p>}
                     </FormGroup>
                     <FormGroup>
                         <Label for="bodyInput">
@@ -108,9 +106,9 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
                             value={currentReview.body || ''}
                             placeholder="Your review text here"
                             type="textarea"
-                            invalid={!!errors.body}
+                            invalid={!!formErrors.body}
                         />
-                    {errors.body && <p className="text-danger">{errors.body}</p>}
+                    {formErrors.body && <p className="text-danger">{formErrors.body}</p>}
                     </FormGroup></div>                
             }
             {loggedIn ? <Button

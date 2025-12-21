@@ -12,6 +12,7 @@ const mapStateToProps = (state) => {
         error: state.reviewsReducer.error,
         currentReview: state.reviewsReducer.currentReview,
         successfulCreate: state.reviewsReducer.successfulCreate,
+        formErrors: state.reviewsReducer.formErrors,
         loggedIn: state.userReducer.loggedIn,
         username: getUsernameFromState(state),
         accountId: state.userReducer.userData ? state.userReducer.userData.sub : null,
@@ -22,7 +23,9 @@ const mapDispatchToProps = {
     getRestaurantsForIds: restaurantsActions.startGetRestaurantsForIdsRequest,
     createReview: reviewsActions.startCreateReviewForRestaurantRequest,
     updateCurrentReview: reviewsActions.updateCurrentReview,
-    resetCreateRequest: reviewsActions.resetCreateRequest
+    resetCreateRequest: reviewsActions.resetCreateRequest,
+    setFormErrors: reviewsActions.setFormErrors,
+    deleteFormError: reviewsActions.deleteFormError,
 };
 
 export default compose(

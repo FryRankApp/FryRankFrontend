@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { reviewsActions } from '../../redux/reducers/reviews';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Input, Label, FormGroup } from 'reactstrap';
 import FryposalLoginImage from "../../Fryposal.png";
 import { PropTypes } from 'prop-types';
 import { ScoreDropdown, validateReview } from "../Common";
-import { clearError } from '../../utils/errorUtils';
 
 const propTypes = {
     modal: PropTypes.bool.isRequired,
@@ -17,17 +16,17 @@ const propTypes = {
 
 export default function EditReviewModal({ modal, signIn, save, review }){
     const dispatch = useDispatch();
+    const formErrors = useSelector(state => state.reviewsReducer.formErrors);
     const [updatedReview, setUpdatedReview] = useState(review);
-    const [errors, setErrors] = useState({});
     
     useEffect(() => {
         setUpdatedReview(review); // Makes sure the review contents prepopulates with the correct values
-        setErrors({}); // Clear errors when review changes
-    }, [review]);
+        dispatch(reviewsActions.setFormErrors({})); // Clear errors when review changes
+    }, [review, dispatch]);
 
     const validateForm = () => {
         const newErrors = validateReview(updatedReview);
-        setErrors(newErrors);
+        dispatch(reviewsActions.setFormErrors(newErrors));
         return Object.keys(newErrors).length === 0;
     };
 
@@ -43,8 +42,8 @@ export default function EditReviewModal({ modal, signIn, save, review }){
         setUpdatedReview(prevReview => ({ ...prevReview, [name]: value, }));
         
         // Clear errors when user types in form fields.
-        if (errors[name]) {
-            setErrors(clearError(errors, name));
+        if (formErrors[name]) {
+            dispatch(reviewsActions.deleteFormError(name));
         }
     };
 
@@ -63,9 +62,9 @@ export default function EditReviewModal({ modal, signIn, save, review }){
                                 value={updatedReview.title || ''} 
                                 onChange={handleInputChange} 
                                 placeholder="Enter new title"
-                                invalid={!!errors.title}
+                                invalid={!!formErrors.title}
                             />
-                            {errors.title && <p className="text-danger">{errors.title}</p>}
+                            {formErrors.title && <p className="text-danger">{formErrors.title}</p>}
                         </FormGroup>
                         <ScoreDropdown 
                             labelName="Score" 
@@ -74,7 +73,7 @@ export default function EditReviewModal({ modal, signIn, save, review }){
                             value={updatedReview.score || ''} 
                             onChange={handleInputChange}
                         />
-                        {errors.score && <p className="text-danger">{errors.score}</p>}
+                        {formErrors.score && <p className="text-danger">{formErrors.score}</p>}
                         <FormGroup>
                             <Label for="bodyInput">Body</Label>
                             <Input
@@ -83,9 +82,9 @@ export default function EditReviewModal({ modal, signIn, save, review }){
                                 type="textarea"
                                 value={updatedReview.body || ''} 
                                 onChange={handleInputChange}
-                                invalid={!!errors.body}
+                                invalid={!!formErrors.body}
                             />
-                            {errors.body && <p className="text-danger">{errors.body}</p>}
+                            {formErrors.body && <p className="text-danger">{formErrors.body}</p>}
                         </FormGroup>
                     </>
                     ):(
