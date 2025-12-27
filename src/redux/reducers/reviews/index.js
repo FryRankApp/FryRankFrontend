@@ -1,3 +1,5 @@
+import { IoReturnUpBack } from "react-icons/io5";
+
 export const types = {
     GET_RESTAURANT_REVIEWS_REQUEST: "GET_RESTAURANT_REVIEWS_REQUEST",
     GET_RESTAURANT_REVIEWS_SUCCESS: "GET_RESTAURANT_REVIEWS_SUCCESS",
@@ -11,7 +13,9 @@ export const types = {
     UPDATE_CURRENT_REVIEW: "UPDATE_CURRENT_REVIEW",
     RESET_CREATE_REQUEST: "RESET_CREATE_REQUEST",
     RESET_REVIEWS: "RESET_REVIEWS",
-    SET_REVIEWS: "SET_REVIEWS"
+    SET_REVIEWS: "SET_REVIEWS",
+    SET_FORM_ERROR: "SET_FORM_ERROR",
+    DELETE_FORM_ERROR: "DELETE_FORM_ERROR"
 }
 
 export const initialState = {
@@ -27,6 +31,7 @@ export const initialState = {
     "accountId": null,
   },
   error: '',
+  formErrors: {},
   successfulCreate: null,
   requestingReviews: false,
 };
@@ -89,7 +94,8 @@ export default (state = initialState, action) => {
                     // Reset the current review, except for the restaurantId, which gets set on page load
                     ...initialState.currentReview,
                     restaurantId: state.currentReview.restaurantId
-                }
+                },
+                formErrors: initialState.formErrors
             };
         }
 
@@ -145,6 +151,22 @@ export default (state = initialState, action) => {
             }
         }
 
+        case types.SET_FORM_ERROR: {
+            return {
+                ...state,
+                formErrors: action.errors
+            }
+        }
+
+        case types.DELETE_FORM_ERROR: {
+            const newFormErrors = { ...state.formErrors };
+            delete newFormErrors[action.errorKey];
+            return {
+                ...state,
+                formErrors: newFormErrors
+            }
+        }
+
         default:
             return state;
   }
@@ -163,5 +185,7 @@ export const reviewsActions = {
     updateCurrentReview: (name, value) => ({ type: types.UPDATE_CURRENT_REVIEW, name, value }),
     resetCreateRequest: () => ({ type: types.RESET_CREATE_REQUEST }),
     resetReviews: () => ({ type: types.RESET_REVIEWS }),
-    setReviews: (reviews) => ({ type: types.SET_REVIEWS, payload: reviews })
+    setReviews: (reviews) => ({ type: types.SET_REVIEWS, payload: reviews }),
+    setFormErrors: (errors) => ({ type: types.SET_FORM_ERROR, errors }),
+    deleteFormError: (errorKey) => ({ type: types.DELETE_FORM_ERROR, errorKey })
 }
