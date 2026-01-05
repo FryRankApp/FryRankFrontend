@@ -10,6 +10,8 @@ export const HEADER_API_KEY = 'X-Goog-Api-Key';
 export const HEADER_FIELD_MASK = 'X-Goog-FieldMask';
 
 export function* callGetRestaurantsForQuery({ textQuery, location, radius }) {
+    console.log('SAGA TRIGGERED: callGetRestaurantsForQuery', { textQuery, location, radius })
+    
     const locationBias = location ?
         {
             "circle": {
@@ -22,6 +24,7 @@ export function* callGetRestaurantsForQuery({ textQuery, location, radius }) {
         } : null;
 
     try {
+        console.log('Making Google API call...')
         const { data } = yield axios.post(GOOGLE_API_PATH + "places:searchText",
             {
                 'textQuery': textQuery && textQuery !== "" ? textQuery : FRENCH_FRIES_TEXT_QUERY,
@@ -36,12 +39,15 @@ export function* callGetRestaurantsForQuery({ textQuery, location, radius }) {
             }}
         );
 
+        console.log('Google API response received:', data)
+
         const aggregateReviewsData = data && data.places
             ? yield axios.get(AGGREGATE_INFORMATION_API_PATH, { params: { ids: (data.places.map(place => place.id).join()), rating: true } })
             : null;
 
         yield put(restaurantsActions.successfulGetRestaurantsForQueryRequest(data, aggregateReviewsData?.data.restaurantIdToRestaurantInformation));
     } catch (err) {
+        console.error('Saga error:', err)
         yield put(restaurantsActions.failedGetRestaurantsForQueryRequest(err.response.data.error.message));
     }
 }
@@ -72,3 +78,5 @@ export default function* watchRestaurantsRequest() {
     yield takeEvery(types.GET_RESTAURANTS_FOR_QUERY_REQUEST, callGetRestaurantsForQuery);
     yield takeEvery(types.GET_RESTAURANTS_FOR_IDS_REQUEST, callGetRestaurantsForIds);
 }
+
+export const restaurantsSaga = watchRestaurantsRequest

@@ -7,7 +7,8 @@ import {
   MapControl,
   useMap
 } from '@vis.gl/react-google-maps';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
+import { Star } from 'lucide-react';
 import { Button } from 'reactstrap';
 import { FrySpinner, Score } from '../../Common';
 import { PATH_RESTAURANT_REVIEWS, PATH_VARIABLE_RESTAURANT_ID } from '../../../constants';
@@ -31,10 +32,8 @@ const Map = ({ showInfoWindow, setShowInfoWindow, setInfoWindowProps, infoWindow
 
     const map = useMap();
 
-    type coords = google.maps.LatLngLiteral
-
     const adjustBounds = () => {
-        const bounds: coords = new google.maps.LatLngBounds();
+        const bounds = new google.maps.LatLngBounds();
         pinData.forEach(place => {
             bounds.extend({
                 lat: place.location.lat,
@@ -61,12 +60,12 @@ const Map = ({ showInfoWindow, setShowInfoWindow, setInfoWindowProps, infoWindow
   }
 
   return (
-    <div>
+    <div className="w-full h-full">
         { !pinData
             ? <FrySpinner />
             : <>
                 <GoogleMap
-                    className='google-map'
+                    className='w-full h-full'
                     gestureHandling={'cooperative'}
                     disableDefaultUI={true}
                     maxZoom={18}
@@ -80,12 +79,15 @@ const Map = ({ showInfoWindow, setShowInfoWindow, setInfoWindowProps, infoWindow
                     />
                     <MapControl position={ControlPosition.TOP_CENTER}>
                         { showMapSearchButton &&
-                            <Button className="my-2" onClick={() => {
-                                getRestaurantsForMapView();
-                                setShowMapSearchButton(false);
-                            }}>
+                            <button 
+                                className="bg-fry-orange hover:bg-fry-orange/90 text-white font-medium px-4 py-2 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg my-2"
+                                onClick={() => {
+                                    getRestaurantsForMapView();
+                                    setShowMapSearchButton(false);
+                                }}
+                            >
                                 Search map area
-                            </Button>
+                            </button>
                         }
                     </MapControl>
                 </GoogleMap>
@@ -94,14 +96,36 @@ const Map = ({ showInfoWindow, setShowInfoWindow, setInfoWindowProps, infoWindow
                         position={{ lat: infoWindowProps?.location.lat, lng: infoWindowProps?.location.lng }}
                         onCloseClick={handleClose}
                     >
-                        <h6 style={{ display: "inline-block" }}>
-                            <Link
-                                to={`${PATH_RESTAURANT_REVIEWS}`.replace(PATH_VARIABLE_RESTAURANT_ID, infoWindowProps?.id)}
-                                onClick={() => setShowInfoWindow(false)}
-                            >{infoWindowProps?.name}</Link>
-                        </h6>
-                        {infoWindowProps.score && <Score score={infoWindowProps.score} size="sm" />}
-                        <p>{infoWindowProps?.address}</p>
+                        <div className="p-3 min-w-[200px]">
+                            <h6 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
+                                <Link
+                                    href={`${PATH_RESTAURANT_REVIEWS}`.replace(PATH_VARIABLE_RESTAURANT_ID, infoWindowProps?.id)}
+                                    onClick={() => setShowInfoWindow(false)}
+                                    className="text-fry-orange hover:text-fry-orange/80 transition-colors"
+                                >
+                                    {infoWindowProps?.name}
+                                </Link>
+                            </h6>
+                            {infoWindowProps.score && (
+                                <div className="flex items-center gap-1 mb-2">
+                                    <Star className={`w-4 h-4 ${
+                                        infoWindowProps.score >= 4.5 ? 'text-green-500' :
+                                        infoWindowProps.score >= 3.5 ? 'text-yellow-500' :
+                                        infoWindowProps.score >= 2.5 ? 'text-orange-500' :
+                                        'text-red-500'
+                                    } fill-current`} />
+                                    <span className={`font-semibold ${
+                                        infoWindowProps.score >= 4.5 ? 'text-green-500' :
+                                        infoWindowProps.score >= 3.5 ? 'text-yellow-500' :
+                                        infoWindowProps.score >= 2.5 ? 'text-orange-500' :
+                                        'text-red-500'
+                                    }`}>
+                                        {infoWindowProps.score?.toFixed(1)}
+                                    </span>
+                                </div>
+                            )}
+                            <p className="text-sm text-gray-600 dark:text-gray-400">{infoWindowProps?.address}</p>
+                        </div>
                     </InfoWindow>
                 }
                 {pinData.length > 0 && !showInfoWindow && shouldAdjustBounds && adjustBounds()}
