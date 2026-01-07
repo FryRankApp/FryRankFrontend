@@ -51,7 +51,7 @@ jobs:
 
           unset REACT_APP_GOOGLE_API_KEY REACT_APP_GOOGLE_AUTH_KEY REACT_APP_BACKEND_SERVICE_PATH
 
-          npm run build
+          CI=false npm run build
 
       - name: Deploy to S3 (Beta)
         run: |
@@ -105,7 +105,7 @@ jobs:
 
           unset REACT_APP_GOOGLE_API_KEY REACT_APP_GOOGLE_AUTH_KEY REACT_APP_BACKEND_SERVICE_PATH
 
-          npm run build
+          CI=false npm run build
 
       - name: Deploy to S3 (Prod)
         run: |
