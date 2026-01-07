@@ -1,0 +1,121 @@
+name: "Deploy Frontend (Beta and Prod)"
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  NODE_VERSION: "18"
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-beta:
+    name: "Deploy to Beta"
+    runs-on: ubuntu-latest
+    environment: beta
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Configure AWS Credentials (Beta)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch SSM parameters and build
+        run: |
+          echo "Fetching encrypted values from SSM..."
+
+          REACT_APP_GOOGLE_API_KEY=$(aws ssm get-parameter --name "GOOGLE_API_KEY" --with-decryption --query "Parameter.Value" --output text)
+          REACT_APP_GOOGLE_AUTH_KEY=$(aws ssm get-parameter --name "GOOGLE_AUTH_KEY" --with-decryption --query "Parameter.Value" --output text)
+          REACT_APP_BACKEND_SERVICE_PATH=$(aws ssm get-parameter --name "BACKEND_SERVICE_PATH" --query "Parameter.Value" --output text)
+
+          echo "REACT_APP_BACKEND_SERVICE_PATH=$REACT_APP_BACKEND_SERVICE_PATH" > .env
+          echo "REACT_APP_GOOGLE_API_KEY=$REACT_APP_GOOGLE_API_KEY" >> .env
+          echo "REACT_APP_GOOGLE_AUTH_KEY=$REACT_APP_GOOGLE_AUTH_KEY" >> .env
+
+          unset REACT_APP_GOOGLE_API_KEY REACT_APP_GOOGLE_AUTH_KEY REACT_APP_BACKEND_SERVICE_PATH
+
+          npm run build
+
+      - name: Deploy to S3 (Beta)
+        run: |
+          echo "Uploading to S3..."
+
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          echo "Detected AWS Account ID: $ACCOUNT_ID"
+
+          BUCKET_NAME="fryrank-app-spa-bucket-${ACCOUNT_ID}"
+          echo "Using bucket: s3://$BUCKET_NAME/"
+
+          aws s3 sync build/ s3://$BUCKET_NAME/ --delete || echo "S3 sync failed"
+
+  deploy-prod:
+    name: "Deploy to Production"
+    runs-on: ubuntu-latest
+    environment: prod
+    needs: deploy-beta
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Configure AWS Credentials (Prod)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch SSM parameters and build
+        run: |
+          echo "Fetching encrypted values from SSM..."
+
+          REACT_APP_GOOGLE_API_KEY=$(aws ssm get-parameter --name "GOOGLE_API_KEY" --with-decryption --query "Parameter.Value" --output text)
+          REACT_APP_GOOGLE_AUTH_KEY=$(aws ssm get-parameter --name "GOOGLE_AUTH_KEY" --with-decryption --query "Parameter.Value" --output text)
+          REACT_APP_BACKEND_SERVICE_PATH=$(aws ssm get-parameter --name "BACKEND_SERVICE_PATH" --query "Parameter.Value" --output text)
+
+          echo "REACT_APP_BACKEND_SERVICE_PATH=$REACT_APP_BACKEND_SERVICE_PATH" > .env
+          echo "REACT_APP_GOOGLE_API_KEY=$REACT_APP_GOOGLE_API_KEY" >> .env
+          echo "REACT_APP_GOOGLE_AUTH_KEY=$REACT_APP_GOOGLE_AUTH_KEY" >> .env
+
+          unset REACT_APP_GOOGLE_API_KEY REACT_APP_GOOGLE_AUTH_KEY REACT_APP_BACKEND_SERVICE_PATH
+
+          npm run build
+
+      - name: Deploy to S3 (Prod)
+        run: |
+          echo "Uploading to S3..."
+
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          echo "Detected AWS Account ID: $ACCOUNT_ID"
+
+          BUCKET_NAME="fryrank-app-spa-bucket-${ACCOUNT_ID}"
+          echo "Using bucket: s3://$BUCKET_NAME/"
+
+          aws s3 sync build/ s3://$BUCKET_NAME/ --delete || echo "S3 sync failed"
+
