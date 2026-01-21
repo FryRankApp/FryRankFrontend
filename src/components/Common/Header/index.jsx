@@ -1,12 +1,79 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Menu, X, ShoppingBag, Utensils, Clock, Heart, Settings, LogIn } from 'lucide-react'
 
 export default function Header({ loggedIn = false }) {
     const [isOpen, setIsOpen] = useState(false)
+    const [user, setUser] = useState(null)
+
+    const scriptRef = useRef(null)
+
+    // Google OAuth setup
+    useEffect(() => {
+        const script = document.createElement("script")
+        script.src = "https://accounts.google.com/gsi/client"
+        script.async = true
+        script.defer = true
+        
+        if (scriptRef.current) {
+            scriptRef.current.appendChild(script)
+        }
+        
+        return () => {
+            scriptRef.current?.removeChild(script)
+        }
+    }, [scriptRef])
+
+    // Global callback for Google Sign-In
+    if (typeof window !== 'undefined') {
+        window.Google_signIn = async (response) => {
+            console.log('Google sign-in response:', response)
+            
+            // Decode JWT token
+            const token = response.credential
+            const base64Url = token.split(".")[1]
+            const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+            const jsonPayload = decodeURIComponent(
+                atob(base64)
+                    .split("")
+                    .map(function (c) {
+                      return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+                    })
+                    .join("")
+            )
+            
+            const userData = JSON.parse(jsonPayload)
+            
+            // Set user state
+            setUser({
+                sub: userData.sub,
+                email: userData.email,
+                name: userData.name,
+                picture: userData.picture
+            })
+            
+            console.log('User signed in:', userData)
+        }
+    }
+
+    // Set client_id for Google Sign-In
+    useEffect(() => {
+        const clientId = process.env.NEXT_PUBLIC_GOOGLE_AUTH_KEY || 'your-google-client-id-here'
+        
+        // Validate client ID
+        if (!clientId || clientId === 'your-google-client-id-here') {
+            console.error('Google OAuth Client ID is not configured properly')
+            return
+        }
+        
+        const onloadElement = document.getElementById('g_id_onload')
+        if (onloadElement) {
+            onloadElement.setAttribute('data-client_id', clientId)
+        }
+    }, [process.env.NEXT_PUBLIC_GOOGLE_AUTH_KEY])
 
     const toggle = () => setIsOpen(!isOpen)
 
@@ -76,10 +143,25 @@ export default function Header({ loggedIn = false }) {
                     <div className="flex items-center gap-4">
                         {/* Login Button - Desktop */}
                         <div className="hidden md:block">
-                            <button className="flex items-center gap-2 px-4 py-2 bg-fry-orange text-white rounded-lg hover:bg-opacity-90 transition-colors duration-200">
-                                <LogIn className="w-4 h-4" />
-                                <span>Login</span>
-                            </button>
+                            <div ref={scriptRef}></div>
+                            <div id="g_id_onload"
+                                 data-client_id={process.env.NEXT_PUBLIC_GOOGLE_AUTH_KEY || 'your-google-client-id-here'}
+                                 data-context="signin"
+                                 data-ux_mode="popup"
+                                 data-callback="Google_signIn"
+                                 data-auto_prompt="false">
+                            </div>
+                            <div className="flex flex-col items-center">
+                                <div
+                                    className="g_id_signin"
+                                    data-type="standard"
+                                    data-size="large"
+                                    data-theme="outline"
+                                    data-text="continue_with"
+                                    data-shape="rectangular"
+                                    data-logo_alignment="center"
+                                ></div>
+                            </div>
                         </div>
 
                         {/* Mobile Menu Toggle */}
@@ -148,10 +230,25 @@ export default function Header({ loggedIn = false }) {
 
                             {/* Mobile Login Button */}
                             <div className="pt-3 border-t border-gray-700 dark:border-gray-800">
-                                <button className="flex items-center gap-2 w-full px-3 py-2 bg-fry-orange text-white rounded-lg hover:bg-opacity-90 transition-colors duration-200 justify-center">
-                                    <LogIn className="w-4 h-4" />
-                                    <span>Login</span>
-                                </button>
+                                <div ref={scriptRef}></div>
+                                <div id="g_id_onload"
+                                     data-client_id={process.env.NEXT_PUBLIC_GOOGLE_AUTH_KEY}
+                                     data-context="signin"
+                                     data-ux_mode="popup"
+                                     data-callback="Google_signIn"
+                                     data-auto_prompt="false">
+                                </div>
+                                <div className="flex flex-col items-center">
+                                    <div
+                                        className="g_id_signin"
+                                        data-type="standard"
+                                        data-size="large"
+                                        data-theme="outline"
+                                        data-text="continue_with"
+                                        data-shape="rectangular"
+                                        data-logo_alignment="center"
+                                    ></div>
+                                </div>
                             </div>
                         </nav>
                     </div>

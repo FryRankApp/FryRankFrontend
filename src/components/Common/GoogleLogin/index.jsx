@@ -1,17 +1,16 @@
-import React from "react";
-import { Link } from 'react-router-dom';
+'use client'
 
-import { userActions } from '../../../redux/reducers/user';
-import {
-    PATH_ACCOUNT_REVIEWS,
-    PATH_VARIABLE_ACCOUNT_ID,
-} from '../../../constants.js'
-import '../style.css'
+import React, { useRef, useEffect } from 'react'
+import Link from 'next/link'
+import { PATH_ACCOUNT_REVIEWS, PATH_VARIABLE_ACCOUNT_ID } from '../../../constants'
 
 const GoogleLogin = ({ setUserData, loggedIn, username, accountId }) => {
 
-    window.Google_signIn = async (response) => {
-        setUserData(decodeJwtResponse(response.credential));
+    // Global callback for Google Sign-In
+    if (typeof window !== 'undefined') {
+        window.Google_signIn = async (response) => {
+            setUserData(decodeJwtResponse(response.credential));
+        }
     }
 
     function decodeJwtResponse(token) {
@@ -29,8 +28,8 @@ const GoogleLogin = ({ setUserData, loggedIn, username, accountId }) => {
         return JSON.parse(jsonPayload);
     }
 
-    const scriptRef = React.useRef(null);
-    React.useEffect(() => {
+    const scriptRef = useRef(null);
+    useEffect(() => {
         const script = document.createElement("script");
 
         script.src = "https://accounts.google.com/gsi/client";
@@ -52,8 +51,8 @@ const GoogleLogin = ({ setUserData, loggedIn, username, accountId }) => {
                 <div>
                     <p className="inline me-1 text-black">Hello,</p>
                     <Link
-                        to={`${PATH_ACCOUNT_REVIEWS}`.replace(PATH_VARIABLE_ACCOUNT_ID, accountId)}
-                        style={{"color":"blue", "text-decoration": "underline"}}
+                        href={`${PATH_ACCOUNT_REVIEWS}`.replace(PATH_VARIABLE_ACCOUNT_ID, accountId)}
+                        className="text-blue-600 hover:text-blue-800 underline"
                     >
                         {username}
                     </Link>
@@ -64,7 +63,7 @@ const GoogleLogin = ({ setUserData, loggedIn, username, accountId }) => {
                     <div ref={scriptRef}></div>
 
                     <div id="g_id_onload"
-                         data-client_id={process.env.REACT_APP_GOOGLE_AUTH_KEY}
+                         data-client_id={process.env.NEXT_PUBLIC_GOOGLE_AUTH_KEY}
                          data-context="signin"
                          data-ux_mode="popup"
                          data-callback="Google_signIn"
