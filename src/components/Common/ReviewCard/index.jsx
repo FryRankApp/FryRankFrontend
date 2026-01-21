@@ -10,7 +10,7 @@ import {
     PATH_VARIABLE_RESTAURANT_ID
 } from '../../../constants.js'
 import '../style.css'
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import EditReviewModal from '../../EditReview/EditReviewModal.jsx';
 import { useState, useCallback, useMemo } from 'react';
 
@@ -23,10 +23,15 @@ const ReviewCard = ({ review, restaurant }) => {
     const userAccountId = useSelector((state)=>state.userReducer.userData?.sub);
     const updatedReview = useSelector((state) => state.reviewsReducer.reviews?.find(r => r.reviewId === review.reviewId && r.accountId === review.accountId));
     const isReviewAuthor = useMemo(() => userAccountId === review.accountId, [userAccountId, review.accountId]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     
-    const save = useCallback(()=>{
-        setIsModalOpen((prev)=>!prev);
+    const editSave = useCallback(()=>{
+        setIsEditModalOpen((prev)=>!prev);
+    },[])
+
+    const deleteReview = useCallback(()=>{
+        setIsDeleteModalOpen((prev)=>!prev);
     },[])
 
     return (
@@ -45,7 +50,8 @@ const ReviewCard = ({ review, restaurant }) => {
                         {updatedReview?.title || review.title}
                         </CardTitle>
                         <Score size="md" score={review.score} />
-                        {isReviewAuthor && ( <FaEdit style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '15px', cursor: 'pointer' }} onClick={save} /> )}                      
+                        {isReviewAuthor && ( <FaEdit style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '50px', cursor: 'pointer' }} onClick={editSave} /> )}  
+                        {isReviewAuthor && ( <FaTrash style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '15px', cursor: 'pointer' }} onClick={deleteReview} /> )}                      
                     </div>
                     { restaurant &&
                         <div>
@@ -82,8 +88,14 @@ const ReviewCard = ({ review, restaurant }) => {
             </Card>
             <EditReviewModal 
                 review={review} 
-                save={save} 
-                modal={isModalOpen}
+                save={editSave} 
+                modal={isEditModalOpen}
+                signIn={userAccountId}
+            /> 
+            <DeleteReviewModal //Todo for next time: Make a separate modal for deleting a review
+                review={review} 
+                save={deleteReview} 
+                modal={isDeleteModalOpen}
                 signIn={userAccountId}
             /> 
         </>
