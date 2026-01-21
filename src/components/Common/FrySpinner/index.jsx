@@ -1,12 +1,12 @@
 import React from 'react'
-import { Spinner } from 'reactstrap'
 import "./spinner.css";
 
 const FrySpinner = () => {
     return (
-        <Spinner className="spinner" color="warning">
+        <div className="flex items-center justify-center">
+            <div className="w-8 h-8 border-4 border-fry-orange border-t-transparent rounded-full animate-spin"></div>
             <p className="visually-hidden">Loading...</p>
-        </Spinner>
+        </div>
     )
 }
 

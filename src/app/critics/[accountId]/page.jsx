@@ -2,25 +2,23 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft, Star, MapPin, Plus, LogIn, Moon, Sun } from 'lucide-react'
+import { ArrowLeft, User, Star, Moon, Sun } from 'lucide-react'
 import Link from 'next/link'
 import Header from '../../../components/Common/Header'
 import { ReviewCardList } from '../../../components/Common'
-import RestaurantHeader from '../../../components/Common/RestaurantHeader'
 import { FrySpinner } from '../../../components/Common'
-import { fetchRestaurantDetails, fetchRestaurantReviews, fetchAggregateInformation } from '../../../utils/api'
+import { fetchAccountReviews, fetchRestaurantDetails, fetchUserSettings } from '../../../utils/api'
 
-export default function RestaurantReviewsPage() {
+export default function CriticReviewsPage() {
   const params = useParams()
   const router = useRouter()
-  const restaurantId = params.restaurantId
+  const accountId = params.accountId
 
-  const [restaurant, setRestaurant] = useState(null)
   const [reviews, setReviews] = useState([])
+  const [restaurants, setRestaurants] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [averageScore, setAverageScore] = useState(null)
-  const [loggedIn, setLoggedIn] = useState(false)
+  const [userSettings, setUserSettings] = useState(null)
   const [isDarkMode, setIsDarkMode] = useState(false)
 
   // Dark mode setup
@@ -47,47 +45,55 @@ export default function RestaurantReviewsPage() {
     }
   }
 
-  // Fetch restaurant and reviews data from backend
+  // Fetch critic data from backend
   useEffect(() => {
-    const fetchRestaurantData = async () => {
+    const fetchCriticData = async () => {
       try {
         setLoading(true)
         
-        // Fetch restaurant details and reviews in parallel
-        const [restaurantResponse, reviewsResponse, aggregateResponse] = await Promise.all([
-          fetchRestaurantDetails(restaurantId),
-          fetchRestaurantReviews(restaurantId),
-          fetchAggregateInformation(restaurantId)
+        // Fetch reviews and user settings in parallel
+        const [reviewsResponse, userSettingsResponse] = await Promise.all([
+          fetchAccountReviews(accountId),
+          fetchUserSettings(accountId)
         ])
-        
-        // Set restaurant data (Google Places API returns single object, not array)
-        if (restaurantResponse) {
-          setRestaurant(restaurantResponse)
-        }
         
         // Set reviews data
         if (reviewsResponse && reviewsResponse.reviews) {
           setReviews(reviewsResponse.reviews)
+          
+          // Fetch restaurant details for all reviews
+          const restaurantIds = [...new Set(reviewsResponse.reviews.map(review => review.restaurantId))]
+          if (restaurantIds.length > 0) {
+            const restaurantPromises = restaurantIds.map(id => fetchRestaurantDetails(id))
+            const restaurantResponses = await Promise.all(restaurantPromises)
+            
+            const restaurantMap = {}
+            restaurantResponses.forEach(restaurant => {
+              if (restaurant) {
+                restaurantMap[restaurant.id] = restaurant
+              }
+            })
+            setRestaurants(restaurantMap)
+          }
         }
         
-        // Set average score from aggregate data
-        if (aggregateResponse && aggregateResponse.restaurantIdToRestaurantInformation && 
-            aggregateResponse.restaurantIdToRestaurantInformation[restaurantId]) {
-          setAverageScore(aggregateResponse.restaurantIdToRestaurantInformation[restaurantId].avgScore)
+        // Set user settings
+        if (userSettingsResponse) {
+          setUserSettings(userSettingsResponse)
         }
         
       } catch (err) {
-        setError(err.message || 'Failed to load restaurant data')
-        console.error('Error fetching restaurant:', err)
+        setError(err.message || 'Failed to load critic data')
+        console.error('Error fetching critic:', err)
       } finally {
         setLoading(false)
       }
     }
 
-    if (restaurantId) {
-      fetchRestaurantData()
+    if (accountId) {
+      fetchCriticData()
     }
-  }, [restaurantId])
+  }, [accountId])
 
   const reviewsBody = () => {
     if (loading) {
@@ -102,23 +108,25 @@ export default function RestaurantReviewsPage() {
             No reviews yet
           </h3>
           <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-            Be the first to share your experience at this restaurant!
+            This critic hasn't published any reviews yet.
           </p>
         </div>
       )
     } else {
-      return <ReviewCardList reviews={reviews} />
+      return <ReviewCardList reviews={reviews} currentRestaurants={restaurants} />
     }
   }
 
-  if (loading && !restaurant) {
+  const criticName = userSettings?.username || accountId
+
+  if (loading && reviews.length === 0) {
     return (
       <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         <Header loggedIn={false} />
         <div className="flex items-center justify-center py-12">
           <div className="flex flex-col items-center">
             <div className="w-8 h-8 border-4 border-fry-orange border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Loading restaurant...</p>
+            <p className="text-gray-600 dark:text-gray-400">Loading critic profile...</p>
           </div>
         </div>
       </div>
@@ -127,7 +135,7 @@ export default function RestaurantReviewsPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <Header loggedIn={loggedIn} />
+      <Header loggedIn={false} />
       
       {/* Dark Mode Toggle */}
       <button
@@ -161,43 +169,29 @@ export default function RestaurantReviewsPage() {
           </div>
         )}
 
-        {/* Restaurant Header */}
-        {restaurant && (
-          <div className="mb-8">
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-lg">
-              <RestaurantHeader 
-                currentRestaurant={restaurant} 
-                averageScore={averageScore} 
-              />
-              
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-4 mt-6">
-                {loggedIn ? (
-                  <Link
-                    href={`/restaurants/${restaurantId}/create`}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-fry-orange text-white rounded-lg hover:bg-fry-orange/90 transition-colors duration-200"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Write a Review
-                  </Link>
-                ) : (
-                  <button
-                    disabled
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
-                  >
-                    <LogIn className="w-4 h-4" />
-                    Log in to Write a Review
-                  </button>
-                )}
+        {/* Critic Header */}
+        <div className="mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-lg">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="bg-fry-orange/10 rounded-full w-16 h-16 flex items-center justify-center">
+                <User className="w-8 h-8 text-fry-orange" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                  {criticName}'s Reviews
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {reviews.length} review{reviews.length !== 1 ? 's' : ''} published
+                </p>
               </div>
             </div>
           </div>
-        )}
+        </div>
 
         {/* Reviews Section */}
         <div>
           <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">
-            Reviews ({reviews.length})
+            Published Reviews
           </h2>
           {reviewsBody()}
         </div>

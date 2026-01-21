@@ -7,11 +7,22 @@ const propTypes = {
 };
 
 const ReviewCardList = ({ reviews, currentRestaurants }) => {
+    const getRestaurant = (restaurantId) => {
+        if (!currentRestaurants) return null;
+        
+        // Handle Map (Redux version) or plain object (Next.js version)
+        if (typeof currentRestaurants.get === 'function') {
+            return currentRestaurants.get(restaurantId);
+        } else {
+            return currentRestaurants[restaurantId];
+        }
+    };
+
     return (
         reviews?.map(review => (
             <ReviewCard
                 review={review}
-                restaurant={currentRestaurants ? currentRestaurants.get(review.restaurantId) : null}
+                restaurant={getRestaurant(review.restaurantId)}
             />
         )).sort((a,b) => {
             // We declare the past for undefined values so that they sort to the end of the array.

@@ -94,7 +94,7 @@ const ReviewCard = ({ review, restaurant }) => {
                 {review.isoDateTime && (
                     <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                         <Calendar className="w-4 h-4" />
-                        <span>{new Date(review.isoDateTime).toLocaleDateString()}</span>
+                        <span>{new Date(review.isoDateTime).toLocaleString()}</span>
                     </div>
                 )}
             </div>
