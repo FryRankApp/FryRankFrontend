@@ -16,9 +16,10 @@ const propTypes = {
     formErrors: PropTypes.object.isRequired,
     setFormErrors: PropTypes.func.isRequired,
     deleteFormError: PropTypes.func.isRequired,
+    idToken: PropTypes.string,
 };
 
-const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurrentReview, loggedIn, username, accountId, formErrors, setFormErrors, deleteFormError }) => {
+const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurrentReview, loggedIn, username, accountId, formErrors, setFormErrors, deleteFormError, idToken }) => {
 
     const validateForm = () => {
         const newErrors = validateReview(currentReview);
@@ -29,7 +30,7 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
     const handleSubmit = (event) => {
         event.preventDefault();
         if (validateForm()) {
-            createReview(currentReview);
+            createReview(currentReview, idToken);
         }
     };
 

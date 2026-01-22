@@ -1,17 +1,18 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 
-import { userActions } from '../../../redux/reducers/user';
 import {
     PATH_ACCOUNT_REVIEWS,
     PATH_VARIABLE_ACCOUNT_ID,
 } from '../../../constants.js'
 import '../style.css'
 
-const GoogleLogin = ({ setUserData, loggedIn, username, accountId }) => {
+const GoogleLogin = ({ setUserData, loggedIn, username, accountId, setIdToken }) => {
 
     window.Google_signIn = async (response) => {
-        setUserData(decodeJwtResponse(response.credential));
+        const userData = decodeJwtResponse(response.credential);
+        setUserData(userData);
+        setIdToken(response.credential);
     }
 
     function decodeJwtResponse(token) {
