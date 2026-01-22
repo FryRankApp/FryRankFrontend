@@ -10,8 +10,7 @@ import '../style.css'
 const GoogleLogin = ({ setUserData, loggedIn, username, accountId, setIdToken }) => {
 
     window.Google_signIn = async (response) => {
-        const userData = decodeJwtResponse(response.credential);
-        setUserData(userData);
+        setUserData(decodeJwtResponse(response.credential));
         setIdToken(response.credential);
     }
 
