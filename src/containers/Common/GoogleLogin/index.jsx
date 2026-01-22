@@ -17,6 +17,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
     setUserData: userActions.setUserData,
+    setIdToken: userActions.setIdToken,
     putUserSettings: userSettingsActions.startPutUserSettingsRequest,
 };
 
