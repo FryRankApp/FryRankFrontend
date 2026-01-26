@@ -10,6 +10,9 @@ export const types = {
     CREATE_REVIEW_FOR_RESTAURANT_REQUEST: "CREATE_REVIEW_FOR_RESTAURANT_REQUEST",
     CREATE_REVIEW_FOR_RESTAURANT_SUCCESS: "CREATE_REVIEW_FOR_RESTAURANT_SUCCESS",
     CREATE_REVIEW_FOR_RESTAURANT_FAILURE: "CREATE_REVIEW_FOR_RESTAURANT_FAILURE",
+    DELETE_REVIEW_FOR_RESTAURANT_REQUEST: "DELETE_REVIEW_FOR_RESTAURANT_REQUEST",
+    DELETE_REVIEW_FOR_RESTAURANT_SUCCESS: "DELETE_REVIEW_FOR_RESTAURANT_SUCCESS",
+    DELETE_REVIEW_FOR_RESTAURANT_FAILURE: "DELETE_REVIEW_FOR_RESTAURANT_FAILURE",
     UPDATE_CURRENT_REVIEW: "UPDATE_CURRENT_REVIEW",
     RESET_CREATE_REQUEST: "RESET_CREATE_REQUEST",
     RESET_REVIEWS: "RESET_REVIEWS",
@@ -33,6 +36,7 @@ export const initialState = {
   error: '',
   formErrors: {},
   successfulCreate: null,
+  successfulDelete: null,
   requestingReviews: false,
 };
 
@@ -120,6 +124,34 @@ export default (state = initialState, action) => {
             }
         }
 
+        case types.DELETE_REVIEW_FOR_RESTAURANT_REQUEST: {           
+            return {
+                ...state,
+                successfulDelete,
+            };
+        }
+
+        case types.DELETE_REVIEW_FOR_RESTAURANT_SUCCESS: {
+            const updatedReviews = state?.reviews?.map(review =>
+                review.reviewId === action.data.reviewId ? action.data : review
+            );
+
+            return {
+                ...state,
+                reviews: updatedReviews,
+                successfulDelete: true,
+                error: ''
+            };
+        }
+
+        case types.DELETE_REVIEW_FOR_RESTAURANT_FAILURE: {
+            return {
+                ...state,
+                successfulDelete: false,
+                error: action.error,    
+            }
+        }
+
         case types.UPDATE_CURRENT_REVIEW: {
             return {
                 ...state,
@@ -182,6 +214,9 @@ export const reviewsActions = {
     startCreateReviewForRestaurantRequest: review => ({ type: types.CREATE_REVIEW_FOR_RESTAURANT_REQUEST, review }),
     successfulCreateReviewForRestaurantRequest: (data) => ({ type: types.CREATE_REVIEW_FOR_RESTAURANT_SUCCESS, data }),
     failedCreateReviewForRestaurantRequest: error => ({ type: types.CREATE_REVIEW_FOR_RESTAURANT_FAILURE, error }),
+    startDeleteReviewForRestaurantRequest: review => ({ type: types.DELETE_REVIEW_FOR_RESTAURANT_REQUEST, review }),
+    successfulDeleteReviewForRestaurantRequest: (data) => ({ type: types.DELETE_REVIEW_FOR_RESTAURANT_SUCCESS, data }),
+    failedDeleteReviewForRestaurantRequest: error => ({ type: types.DELETE_REVIEW_FOR_RESTAURANT_FAILURE, error }),
     updateCurrentReview: (name, value) => ({ type: types.UPDATE_CURRENT_REVIEW, name, value }),
     resetCreateRequest: () => ({ type: types.RESET_CREATE_REQUEST }),
     resetReviews: () => ({ type: types.RESET_REVIEWS }),

@@ -12,6 +12,7 @@ import {
 import '../style.css'
 import { FaEdit, FaTrash } from "react-icons/fa";
 import EditReviewModal from '../../EditReview/EditReviewModal.jsx';
+import DeleteReviewModal from '../../DeleteReview/DeleteReviewModal.jsx'
 import { useState, useCallback, useMemo } from 'react';
 
 const propTypes = {
@@ -92,9 +93,9 @@ const ReviewCard = ({ review, restaurant }) => {
                 modal={isEditModalOpen}
                 signIn={userAccountId}
             /> 
-            <DeleteReviewModal //Todo for next time: Make a separate modal for deleting a review
-                review={review} 
-                save={deleteReview} 
+            <DeleteReviewModal
+                reviewId={review.reviewId} 
+                option={deleteReview} 
                 modal={isDeleteModalOpen}
                 signIn={userAccountId}
             /> 

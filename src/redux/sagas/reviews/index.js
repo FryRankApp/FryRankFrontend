@@ -39,6 +39,15 @@ export function* callCreateReviewForRestaurant({ review }) {
     }
 }
 
+export function* callDeleteReviewForRestaurantRequest( {reviewId} ){
+    try{
+        yield axios.delete(REVIEWS_API_PATH, { params: { reviewId } });
+        yield put(reviewsActions.successfulDeleteReviewForRestaurantRequest(reviewId))
+    } catch (err) {
+        yield put(reviewsActions.failedDeleteReviewForRestaurantRequest(err.response.data.message));
+    }
+}
+
 export default function* watchReviewsRequest() {
     yield takeEvery(types.GET_RESTAURANT_REVIEWS_REQUEST, callGetAllReviewsForRestaurant);
     yield takeEvery(types.GET_ACCOUNT_REVIEWS_REQUEST, callGetAllReviewsForAccount);
