@@ -45,11 +45,9 @@ export default function Header({loggedIn}) {
                         </NavItem>
 
                         <NavItem>  
-                            <NavLink>                      
-                                <Link to='/donate'>
-                                    <h4> Donate </h4>
-                                </Link> 
-                            </NavLink>                         
+                            <NavLink href={process.env.REACT_APP_STRIPE_DONATE_LINK || 'https://buy.stripe.com/'} target="_blank" rel="noopener noreferrer">
+                                <h4> Donate </h4>
+                            </NavLink>
                         </NavItem>
 
                         {
