@@ -8,7 +8,6 @@ export const PATH_ACCOUNT_REVIEWS = `/critics/${PATH_VARIABLE_ACCOUNT_ID}`
 export const PATH_CREATE_REVIEW = `${PATH_RESTAURANTS}/${PATH_VARIABLE_RESTAURANT_ID}/create`
 export const PATH_RECENT_REVIEW = "/recent-reviews"
 export const PATH_USER_SETTINGS = "/userSettings"
-export const PATH_DONATE = "/donate"
 
 export const BACKEND_SERVICE_PATH = process.env.REACT_APP_BACKEND_SERVICE_PATH;
 
