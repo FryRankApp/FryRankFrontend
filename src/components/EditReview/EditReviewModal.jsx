@@ -17,6 +17,7 @@ const propTypes = {
 export default function EditReviewModal({ modal, signIn, save, review }){
     const dispatch = useDispatch();
     const formErrors = useSelector(state => state.reviewsReducer.formErrors);
+    const idToken = useSelector(state => state.userReducer.idToken);
     const [updatedReview, setUpdatedReview] = useState(review);
     
     useEffect(() => {
@@ -32,7 +33,7 @@ export default function EditReviewModal({ modal, signIn, save, review }){
 
     const handleSaveClick = async ()=>{
         if (validateForm()) {
-            dispatch(reviewsActions.startCreateReviewForRestaurantRequest(updatedReview));
+            dispatch(reviewsActions.startCreateReviewForRestaurantRequest(updatedReview, idToken));
             save();
         }
     };

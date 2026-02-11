@@ -26,16 +26,28 @@ export function* callGetAllReviewsForAccount({ accountId }) {
     }
 }
 
-export function* callCreateReviewForRestaurant({ review }) {
+export function* callCreateReviewForRestaurant({ review, idToken }) {
     try {
+        if (!idToken) {
+            throw new Error('User not authenticated');
+        }
+        
         review = {
             ...review,
             [REVIEW_PROPERTY_ISO_DATE_TIME]: new Date().toISOString()
         };
-        yield axios.post(REVIEWS_API_PATH, review);
+        
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${idToken}`,
+                'Content-Type': 'application/json'
+            }
+        };
+        
+        yield axios.post(REVIEWS_API_PATH, review, config);
         yield put(reviewsActions.successfulCreateReviewForRestaurantRequest(review));
     } catch (err) {
-        yield put(reviewsActions.failedCreateReviewForRestaurantRequest(err.response.data.message));
+        yield put(reviewsActions.failedCreateReviewForRestaurantRequest(err.response?.data?.message || err.message));
     }
 }
 

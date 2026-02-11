@@ -16,6 +16,7 @@ const mapStateToProps = (state) => {
         loggedIn: state.userReducer.loggedIn,
         username: getUsernameFromState(state),
         accountId: state.userReducer.userData ? state.userReducer.userData.sub : null,
+        idToken: state.userReducer.idToken,
     }
 }
 

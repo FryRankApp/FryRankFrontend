@@ -17,7 +17,7 @@ const propTypes = {
     deleteFormError: PropTypes.func.isRequired,
 };
 
-const CreateReview = ({ params: { restaurantId }, error, currentRestaurants, currentReview, updateCurrentReview, createReview, loggedIn, username, accountId, formErrors, setFormErrors, deleteFormError }) => {
+const CreateReview = ({ params: { restaurantId }, error, currentRestaurants, currentReview, updateCurrentReview, createReview, loggedIn, username, accountId, formErrors, setFormErrors, deleteFormError, idToken }) => {
     const currentRestaurant = currentRestaurants && currentRestaurants.size > 0
         ? currentRestaurants.get(restaurantId)
         : null;
@@ -42,6 +42,7 @@ const CreateReview = ({ params: { restaurantId }, error, currentRestaurants, cur
                 formErrors = {formErrors}
                 setFormErrors = {setFormErrors}
                 deleteFormError = {deleteFormError}
+                idToken = {idToken}
             />
         </div>
     )
