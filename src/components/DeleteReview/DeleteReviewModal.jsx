@@ -15,8 +15,9 @@ const propTypes = {
 
 export default function DeleteReviewModal({ modal, signIn, option, reviewId }){
     const dispatch = useDispatch();
+    const idToken = useSelector(state => state.userReducer.idToken);
     const handleDeleteClick = async () =>{
-        dispatch(reviewsActions.startDeleteReviewForRestaurantRequest(reviewId));
+        dispatch(reviewsActions.startDeleteReviewForRestaurantRequest(reviewId, idToken));
         option();
     }
 

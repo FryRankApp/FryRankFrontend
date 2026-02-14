@@ -127,13 +127,15 @@ export default (state = initialState, action) => {
         case types.DELETE_REVIEW_FOR_RESTAURANT_REQUEST: {           
             return {
                 ...state,
-                successfulDelete,
+                currentReview: {
+                    ...initialState.currentReview
+                }
             };
         }
 
         case types.DELETE_REVIEW_FOR_RESTAURANT_SUCCESS: {
-            const updatedReviews = state?.reviews?.map(review =>
-                review.reviewId === action.data.reviewId ? action.data : review
+            const updatedReviews = state?.reviews?.filter(review =>
+                review.reviewId !== action.data
             );
 
             return {
@@ -214,7 +216,7 @@ export const reviewsActions = {
     startCreateReviewForRestaurantRequest: (review, idToken) => ({ type: types.CREATE_REVIEW_FOR_RESTAURANT_REQUEST, review, idToken }),
     successfulCreateReviewForRestaurantRequest: (data) => ({ type: types.CREATE_REVIEW_FOR_RESTAURANT_SUCCESS, data }),
     failedCreateReviewForRestaurantRequest: error => ({ type: types.CREATE_REVIEW_FOR_RESTAURANT_FAILURE, error }),
-    startDeleteReviewForRestaurantRequest: review => ({ type: types.DELETE_REVIEW_FOR_RESTAURANT_REQUEST, review }),
+    startDeleteReviewForRestaurantRequest: (reviewId, idToken) => ({ type: types.DELETE_REVIEW_FOR_RESTAURANT_REQUEST, reviewId, idToken }),
     successfulDeleteReviewForRestaurantRequest: (data) => ({ type: types.DELETE_REVIEW_FOR_RESTAURANT_SUCCESS, data }),
     failedDeleteReviewForRestaurantRequest: error => ({ type: types.DELETE_REVIEW_FOR_RESTAURANT_FAILURE, error }),
     updateCurrentReview: (name, value) => ({ type: types.UPDATE_CURRENT_REVIEW, name, value }),
