@@ -45,11 +45,9 @@ export default function Header({loggedIn}) {
                         </NavItem>
 
                         <NavItem>  
-                            <NavLink>                      
-                                <Link to='/donate'>
-                                    <h4> Donate </h4>
-                                </Link> 
-                            </NavLink>                         
+                            <NavLink href="https://buy.stripe.com/6oU4gygu35Qt9utf351kA00" target="_blank" rel="noopener noreferrer">
+                                <h4> Donate </h4>
+                            </NavLink>
                         </NavItem>
 
                         {
