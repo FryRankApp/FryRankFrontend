@@ -51,8 +51,29 @@ export function* callCreateReviewForRestaurant({ review, idToken }) {
     }
 }
 
+export function* callDeleteReviewForRestaurantRequest( {reviewId, idToken} ){
+    try{
+        if(!idToken) {
+            throw new Error('User not authenticated');
+        }
+
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${idToken}`,
+                'Content-Type': 'application/json'
+            }
+        };
+
+        yield axios.delete(REVIEWS_API_PATH, { ...config, data: { reviewId } });
+        yield put(reviewsActions.successfulDeleteReviewForRestaurantRequest(reviewId))
+    } catch (err) {
+        yield put(reviewsActions.failedDeleteReviewForRestaurantRequest(err.response.data.message));
+    }
+}
+
 export default function* watchReviewsRequest() {
     yield takeEvery(types.GET_RESTAURANT_REVIEWS_REQUEST, callGetAllReviewsForRestaurant);
     yield takeEvery(types.GET_ACCOUNT_REVIEWS_REQUEST, callGetAllReviewsForAccount);
     yield takeEvery(types.CREATE_REVIEW_FOR_RESTAURANT_REQUEST, callCreateReviewForRestaurant);
+    yield takeEvery(types.DELETE_REVIEW_FOR_RESTAURANT_REQUEST, callDeleteReviewForRestaurantRequest);
 }
