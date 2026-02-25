@@ -32,11 +32,6 @@ export function* callCreateReviewForRestaurant({ review, idToken }) {
             throw new Error('User not authenticated');
         }
         
-        review = {
-            ...review,
-            [REVIEW_PROPERTY_ISO_DATE_TIME]: new Date().toISOString()
-        };
-        
         const config = {
             headers: {
                 'Authorization': `Bearer ${idToken}`,

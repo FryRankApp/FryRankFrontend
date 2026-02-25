@@ -26,12 +26,9 @@ export const initialState = {
   averageScore: null,
   currentReview: {
     "restaurantId": null,
-    "authorId": null,
     "score": null,
     "title": null,
     "body": null,
-    "isoDateTime": null,
-    "accountId": null,
   },
   error: '',
   formErrors: {},

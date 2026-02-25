@@ -11,13 +11,12 @@ const propTypes = {
     createReview: PropTypes.func.isRequired,
     loggedIn: PropTypes.bool.isRequired,
     username: PropTypes.string.isRequired,
-    accountId: PropTypes.string.isRequired,
     formErrors: PropTypes.object.isRequired,
     setFormErrors: PropTypes.func.isRequired,
     deleteFormError: PropTypes.func.isRequired,
 };
 
-const CreateReview = ({ params: { restaurantId }, error, currentRestaurants, currentReview, updateCurrentReview, createReview, loggedIn, username, accountId, formErrors, setFormErrors, deleteFormError, idToken }) => {
+const CreateReview = ({ params: { restaurantId }, error, currentRestaurants, currentReview, updateCurrentReview, createReview, loggedIn, username, formErrors, setFormErrors, deleteFormError, idToken }) => {
     const currentRestaurant = currentRestaurants && currentRestaurants.size > 0
         ? currentRestaurants.get(restaurantId)
         : null;
@@ -38,7 +37,6 @@ const CreateReview = ({ params: { restaurantId }, error, currentRestaurants, cur
                 updateCurrentReview = {updateCurrentReview}
                 loggedIn = {loggedIn}
                 username = {username}
-                accountId = {accountId}
                 formErrors = {formErrors}
                 setFormErrors = {setFormErrors}
                 deleteFormError = {deleteFormError}
