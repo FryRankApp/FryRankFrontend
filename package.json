@@ -22,7 +22,7 @@
     "react-scripts": "^5.0.1",
     "reactstrap": "^8.10.1",
     "redux-saga": "^1.2.3",
-    "serve": "^14.2.5",
+    "serve": "^14.2.6",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
