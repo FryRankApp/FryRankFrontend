@@ -110,10 +110,10 @@ export default (state = initialState, action) => {
 }
 
 export const userSettingsActions = {
-    startPutUserSettingsRequest: (accountId, defaultUsername) => ({ type: types.PUT_USER_SETTINGS_REQUEST, accountId, defaultUsername }),
+    startPutUserSettingsRequest: (accountId, defaultUsername, idToken) => ({ type: types.PUT_USER_SETTINGS_REQUEST, accountId, defaultUsername, idToken }),
     successfulPutUserSettingsRequest: data => ({ type: types.PUT_USER_SETTINGS_SUCCESS, data }),
     failedPutUserSettingsRequest: error => ({ type: types.PUT_USER_SETTINGS_FAILURE, error }),
-    startSetUserSettingsRequest: userSettings => ({ type: types.SET_USER_SETTINGS_REQUEST, userSettings }),
+    startSetUserSettingsRequest: (userSettings, idToken) => ({ type: types.SET_USER_SETTINGS_REQUEST, userSettings, idToken }),
     successfulSetUserSettingsRequest: data => ({ type: types.SET_USER_SETTINGS_SUCCESS, data }),
     failedSetUserSettingsRequest: error => ({ type:types.SET_USER_SETTINGS_FAILURE, error }),
     updateCurrentUserSettings: (name, value) => ({ type:types.UPDATE_CURRENT_USER_SETTINGS, name, value }),

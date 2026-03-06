@@ -12,6 +12,7 @@ const mapStateToProps = (state) => {
         currentUserSettings: state.userSettingsReducer.currentUserSettings ? {...state.userSettingsReducer.currentUserSettings, "accountId": accountId} : null,
         error: state.userSettingsReducer.error,
         successfulSetUserSettings: state.userSettingsReducer.successfulSetUserSettings,
+        idToken: state.userReducer.idToken,
     }
 }
 

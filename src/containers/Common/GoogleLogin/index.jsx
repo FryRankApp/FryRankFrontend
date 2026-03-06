@@ -12,6 +12,7 @@ const mapStateToProps = (state) => {
         accountId: state.userReducer.userData ? state.userReducer.userData.sub : null,
         userSettings: state.userSettingsReducer.userSettings ? state.userSettingsReducer.userSettings : null,
         defaultUsername: state.userReducer.userData ? state.userReducer.userData.given_name : null,
+        idToken: state.userReducer.idToken,
     }
 }
 
@@ -25,9 +26,9 @@ export default compose(
     connect(mapStateToProps, mapDispatchToProps),
     lifecycle({
         componentDidUpdate() {
-            const { loggedIn, putUserSettings, userSettings, accountId, defaultUsername } = this.props;
+            const { loggedIn, putUserSettings, userSettings, accountId, defaultUsername, idToken } = this.props;
             if(loggedIn && userSettings === null) {
-                putUserSettings(accountId, defaultUsername);
+                putUserSettings(accountId, defaultUsername, idToken);
             }
         }
     }),
