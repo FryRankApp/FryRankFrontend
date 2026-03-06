@@ -45,5 +45,21 @@ echo "Deploying to S3 bucket: s3://$BUCKET_NAME/"
 # Sync build directory to S3
 aws s3 sync build/ "s3://$BUCKET_NAME/" --delete
 
+# Find CloudFront distribution ID for this bucket origin
+echo "Finding CloudFront distribution for bucket origin..."
+DISTRIBUTION_ID=$(aws cloudfront list-distributions \
+  --query "DistributionList.Items[?Origins.Items[?contains(DomainName, '${BUCKET_NAME}.s3')]].Id | [0]" \
+  --output text)
+
+if [ -z "$DISTRIBUTION_ID" ] || [ "$DISTRIBUTION_ID" = "None" ]; then
+  echo "Error: Could not find a CloudFront distribution for origin containing '${BUCKET_NAME}.s3'"
+  exit 1
+fi
+
+echo "Invalidating CloudFront cache for distribution: $DISTRIBUTION_ID"
+aws cloudfront create-invalidation \
+  --distribution-id "$DISTRIBUTION_ID" \
+  --paths "/*"
+
 echo "Deployment completed successfully!"
 echo "Your application is now available at: https://$BUCKET_NAME.s3.amazonaws.com/index.html"

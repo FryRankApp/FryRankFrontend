@@ -54,6 +54,29 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b %ERRORLEVEL%
 )
 
+echo Finding CloudFront distribution for bucket origin...
+for /f "tokens=*" %%a in ('aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?contains(DomainName, '%BUCKET_NAME%.s3')]].Id | [0]" --output text') do set DISTRIBUTION_ID=%%a
+
+if "%DISTRIBUTION_ID%"=="" (
+    echo Error: Could not find a CloudFront distribution for origin containing '%BUCKET_NAME%.s3'
+    exit /b 1
+)
+
+if /I "%DISTRIBUTION_ID%"=="None" (
+    echo Error: Could not find a CloudFront distribution for origin containing '%BUCKET_NAME%.s3'
+    exit /b 1
+)
+
+echo Invalidating CloudFront cache for distribution: %DISTRIBUTION_ID%
+aws cloudfront create-invalidation ^
+  --distribution-id %DISTRIBUTION_ID% ^
+  --paths "/*"
+
+if %ERRORLEVEL% NEQ 0 (
+    echo Error: CloudFront invalidation failed
+    exit /b %ERRORLEVEL%
+)
+
 echo Deployment completed successfully!
 echo Your application is now available at: https://%BUCKET_NAME%.s3.amazonaws.com/index.html
 
