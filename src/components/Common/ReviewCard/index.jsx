@@ -29,12 +29,15 @@ const ReviewCard = ({ review, restaurant }) => {
     const isReviewAuthor = useMemo(() => userAccountId === review.accountId, [userAccountId, review.accountId]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const isDisabled=false;
+    const idToken = useSelector((state) => state.userReducer.idToken);
+    const displayReview = updatedReview ?? review;
+    const currentLikeCount = displayReview?.likeCount ?? review.likeCount ?? 0;
+
     const handleLike = useCallback(() => {
+        const newLikeCount = currentLikeCount + 1;
         dispatch(reviewsActions.incrementLikeCount(review.reviewId));
-        isDisabled=true;
-       // dispatch(reviewsActions.startLikeReviewRequest(review.reviewId, idToken));
-    }, [dispatch, review.reviewId]);
+        dispatch(reviewsActions.startLikeReviewRequest(review.reviewId, newLikeCount, idToken));
+    }, [dispatch, review.reviewId, currentLikeCount, idToken]);
     
     const editSave = useCallback(()=>{
         setIsEditModalOpen((prev)=>!prev);
@@ -61,7 +64,6 @@ const ReviewCard = ({ review, restaurant }) => {
                                 type="button"
                                 className="btn btn-link p-0 border-0 text-decoration-none"
                                 onClick={handleLike}
-                                disabled={isDisabled}
                                 title="Like"
                                 aria-label="Like"
                                 style={{ fontSize: '1.5rem', cursor: 'pointer' }}
@@ -69,7 +71,7 @@ const ReviewCard = ({ review, restaurant }) => {
                                 👍
                             </button>
                             <span className="text-muted">
-                                {String(review.likeCount ?? 0)}
+                                {String(currentLikeCount)}
                             </span>
                         </div>
                     )}

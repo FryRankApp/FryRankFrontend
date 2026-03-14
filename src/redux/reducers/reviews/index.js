@@ -255,6 +255,6 @@ export const reviewsActions = {
     setFormErrors: (errors) => ({ type: types.SET_FORM_ERROR, errors }),
     deleteFormError: (errorKey) => ({ type: types.DELETE_FORM_ERROR, errorKey }),
     incrementLikeCount: (reviewId) => ({ type: types.INCREMENT_LIKE_COUNT, reviewId }),
-    startLikeReviewRequest: (reviewId, idToken) => ({ type: types.LIKE_REVIEW_REQUEST, reviewId, idToken }),
+    startLikeReviewRequest: (reviewId, likeCount, idToken) => ({ type: types.LIKE_REVIEW_REQUEST, reviewId, likeCount, idToken }),
     rollbackLikeReview: (reviewId) => ({ type: types.ROLLBACK_LIKE_REVIEW, reviewId })
 }

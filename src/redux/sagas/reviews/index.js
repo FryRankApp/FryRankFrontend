@@ -73,7 +73,7 @@ export function* callDeleteReviewForRestaurantRequest( {reviewId, idToken} ){
 
 const REVIEWS_LIKE_API_PATH = `${REVIEWS_API_PATH}/like`;
 
-export function* callLikeReview({ reviewId, idToken }) {
+export function* callLikeReview({ reviewId, likeCount, idToken }) {
     try {
         if (!idToken) {
             throw new Error('User must be signed in to like a review');
@@ -84,7 +84,7 @@ export function* callLikeReview({ reviewId, idToken }) {
                 'Content-Type': 'application/json'
             }
         };
-        yield axios.post(REVIEWS_LIKE_API_PATH, { reviewId }, config);
+        yield axios.put(REVIEWS_LIKE_API_PATH, { reviewId, likeCount }, config);
     } catch (err) {
         yield put(reviewsActions.rollbackLikeReview(reviewId));
     }
