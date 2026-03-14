@@ -2,7 +2,7 @@ import { PropTypes } from 'prop-types';
 import { Card, CardBody, CardSubtitle, CardText, CardTitle } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Score } from '../';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import {
     PATH_ACCOUNT_REVIEWS,
     PATH_RESTAURANT_REVIEWS,
@@ -12,7 +12,8 @@ import {
 import '../style.css'
 import { FaEdit, FaTrash } from "react-icons/fa";
 import EditReviewModal from '../../EditReview/EditReviewModal.jsx';
-import DeleteReviewModal from '../../DeleteReview/DeleteReviewModal.jsx'
+import DeleteReviewModal from '../../DeleteReview/DeleteReviewModal.jsx';
+import { reviewsActions } from '../../../redux/reducers/reviews';
 import { useState, useCallback, useMemo } from 'react';
 
 const propTypes = {
@@ -21,11 +22,22 @@ const propTypes = {
 };
 
 const ReviewCard = ({ review, restaurant }) => {
+    const dispatch = useDispatch();
     const userAccountId = useSelector((state)=>state.userReducer.userData?.sub);
+    const loggedIn = useSelector((state) => state.userReducer.loggedIn);
     const updatedReview = useSelector((state) => state.reviewsReducer.reviews?.find(r => r.reviewId === review.reviewId && r.accountId === review.accountId));
     const isReviewAuthor = useMemo(() => userAccountId === review.accountId, [userAccountId, review.accountId]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const idToken = useSelector((state) => state.userReducer.idToken);
+    const displayReview = updatedReview ?? review;
+    const currentLikeCount = displayReview?.likeCount ?? review.likeCount ?? 0;
+
+    const handleLike = useCallback(() => {
+        const newLikeCount = currentLikeCount + 1;
+        dispatch(reviewsActions.incrementLikeCount(review.reviewId));
+        dispatch(reviewsActions.startLikeReviewRequest(review.reviewId, newLikeCount, idToken));
+    }, [dispatch, review.reviewId, currentLikeCount, idToken]);
     
     const editSave = useCallback(()=>{
         setIsEditModalOpen((prev)=>!prev);
@@ -46,13 +58,31 @@ const ReviewCard = ({ review, restaurant }) => {
                 }}
             >
                 <CardBody>
+                    {loggedIn && (
+                        <div className="d-flex align-items-center gap-2 mb-2">
+                            <button
+                                type="button"
+                                className="btn btn-link p-0 border-0 text-decoration-none"
+                                onClick={handleLike}
+                                title="Like"
+                                aria-label="Like"
+                                style={{ fontSize: '1.5rem', cursor: 'pointer' }}
+                            >
+                                👍
+                            </button>
+                            <span className="text-muted">
+                                {String(currentLikeCount)}
+                            </span>
+                        </div>
+                    )}
                     <div>
                         <CardTitle tag="h3" style={{ display: "inline-block" }}>
                         {updatedReview?.title || review.title}
                         </CardTitle>
                         <Score size="md" score={review.score} />
                         {isReviewAuthor && ( <FaEdit style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '50px', cursor: 'pointer' }} onClick={editSave} /> )}  
-                        {isReviewAuthor && ( <FaTrash style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '15px', cursor: 'pointer' }} onClick={deleteReview} /> )}                      
+                        {isReviewAuthor && ( <FaTrash style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '15px', cursor: 'pointer' }} onClick={deleteReview} /> )}  
+                                     
                     </div>
                     { restaurant &&
                         <div>

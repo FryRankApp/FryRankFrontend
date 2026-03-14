@@ -18,7 +18,10 @@ export const types = {
     RESET_REVIEWS: "RESET_REVIEWS",
     SET_REVIEWS: "SET_REVIEWS",
     SET_FORM_ERROR: "SET_FORM_ERROR",
-    DELETE_FORM_ERROR: "DELETE_FORM_ERROR"
+    DELETE_FORM_ERROR: "DELETE_FORM_ERROR",
+    INCREMENT_LIKE_COUNT: "INCREMENT_LIKE_COUNT",
+    LIKE_REVIEW_REQUEST: "LIKE_REVIEW_REQUEST",
+    ROLLBACK_LIKE_REVIEW: "ROLLBACK_LIKE_REVIEW"
 }
 
 export const initialState = {
@@ -195,7 +198,33 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 formErrors: newFormErrors
-            }
+            };
+        }
+
+        case types.INCREMENT_LIKE_COUNT: {
+            const { reviewId } = action;
+            const updatedReviews = state?.reviews?.map(review =>
+                review.reviewId === reviewId
+                    ? { ...review, likeCount: (review.likeCount ?? 0) + 1 }
+                    : review
+            );
+            return {
+                ...state,
+                reviews: updatedReviews
+            };
+        }
+
+        case types.ROLLBACK_LIKE_REVIEW: {
+            const { reviewId } = action;
+            const updatedReviews = state?.reviews?.map(review =>
+                review.reviewId === reviewId
+                    ? { ...review, likeCount: Math.max(0, (review.likeCount ?? 1) - 1) }
+                    : review
+            );
+            return {
+                ...state,
+                reviews: updatedReviews
+            };
         }
 
         default:
@@ -221,5 +250,8 @@ export const reviewsActions = {
     resetReviews: () => ({ type: types.RESET_REVIEWS }),
     setReviews: (reviews) => ({ type: types.SET_REVIEWS, payload: reviews }),
     setFormErrors: (errors) => ({ type: types.SET_FORM_ERROR, errors }),
-    deleteFormError: (errorKey) => ({ type: types.DELETE_FORM_ERROR, errorKey })
+    deleteFormError: (errorKey) => ({ type: types.DELETE_FORM_ERROR, errorKey }),
+    incrementLikeCount: (reviewId) => ({ type: types.INCREMENT_LIKE_COUNT, reviewId }),
+    startLikeReviewRequest: (reviewId, likeCount, idToken) => ({ type: types.LIKE_REVIEW_REQUEST, reviewId, likeCount, idToken }),
+    rollbackLikeReview: (reviewId) => ({ type: types.ROLLBACK_LIKE_REVIEW, reviewId })
 }
