@@ -8,11 +8,13 @@ import withRouter from '../Common/withRouter';
 const mapStateToProps = (state) => {
     return {
         reviews: state.reviewsReducer.reviews,
+        nextCursor: state.reviewsReducer.nextCursor,
         averageScore: state.reviewsReducer.averageScore,
         currentRestaurants: state.restaurantsReducer.currentRestaurants,
         reviewsError: state.reviewsReducer.error,
         restaurantsError: state.restaurantsReducer.error,
         requestingRestaurantDetails: state.restaurantsReducer.requestingRestaurantDetails,
+        requestingReviews: state.reviewsReducer.requestingReviews,
         loggedIn: state.userReducer.loggedIn,
     }
 }

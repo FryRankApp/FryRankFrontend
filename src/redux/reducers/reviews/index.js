@@ -23,6 +23,7 @@ export const types = {
 
 export const initialState = {
   reviews: null,
+  nextCursor: null,
   averageScore: null,
   currentReview: {
     "restaurantId": null,
@@ -49,7 +50,10 @@ export default (state = initialState, action) => {
         case types.GET_RESTAURANT_REVIEWS_SUCCESS: {
             return {
                 ...state,
-                reviews: action.reviewsData.reviews,
+                reviews: action.isLoadMore
+                    ? [...(state.reviews || []), ...action.reviewsData.reviews]
+                    : action.reviewsData.reviews,
+                nextCursor: action.nextCursor,
                 averageScore: action.averageScore,
                 requestingReviews: false,
                 error: ''
@@ -74,7 +78,10 @@ export default (state = initialState, action) => {
         case types.GET_ACCOUNT_REVIEWS_SUCCESS: {
             return {
                 ...state,
-                reviews: action.reviewsData.reviews,
+                reviews: action.isLoadMore
+                    ? [...(state.reviews || []), ...action.reviewsData.reviews]
+                    : action.reviewsData.reviews,
+                nextCursor: action.nextCursor,
                 requestingReviews: false,
                 error: ''
             };
@@ -171,7 +178,8 @@ export default (state = initialState, action) => {
         case types.RESET_REVIEWS: {
             return {
                 ...state,
-                reviews: initialState.reviews
+                reviews: initialState.reviews,
+                nextCursor: initialState.nextCursor,
             }
         }
 
@@ -204,11 +212,11 @@ export default (state = initialState, action) => {
 }
 
 export const reviewsActions = {
-    startGetAllReviewsForRestaurantRequest: restaurantId => ({ type: types.GET_RESTAURANT_REVIEWS_REQUEST, restaurantId }),
-    successfulGetAllReviewsForRestaurantRequest: (reviewsData, averageScore) => ({ type: types.GET_RESTAURANT_REVIEWS_SUCCESS, reviewsData, averageScore }),
+    startGetAllReviewsForRestaurantRequest: (restaurantId, cursor = null) => ({ type: types.GET_RESTAURANT_REVIEWS_REQUEST, restaurantId, cursor }),
+    successfulGetAllReviewsForRestaurantRequest: (reviewsData, averageScore, nextCursor, isLoadMore) => ({ type: types.GET_RESTAURANT_REVIEWS_SUCCESS, reviewsData, averageScore, nextCursor, isLoadMore }),
     failedGetAllReviewsForRestaurantRequest: error => ({ type: types.GET_RESTAURANT_REVIEWS_FAILURE, error }),
-    startGetAllReviewsForAccountRequest: accountId => ({ type: types.GET_ACCOUNT_REVIEWS_REQUEST, accountId }),
-    successfulGetAllReviewsForAccountRequest: (reviewsData) => ({ type: types.GET_ACCOUNT_REVIEWS_SUCCESS, reviewsData }),
+    startGetAllReviewsForAccountRequest: (accountId, cursor = null) => ({ type: types.GET_ACCOUNT_REVIEWS_REQUEST, accountId, cursor }),
+    successfulGetAllReviewsForAccountRequest: (reviewsData, nextCursor, isLoadMore) => ({ type: types.GET_ACCOUNT_REVIEWS_SUCCESS, reviewsData, nextCursor, isLoadMore }),
     failedGetAllReviewsForAccountRequest: error => ({ type: types.GET_ACCOUNT_REVIEWS_FAILURE, error }),
     startCreateReviewForRestaurantRequest: (review, idToken) => ({ type: types.CREATE_REVIEW_FOR_RESTAURANT_REQUEST, review, idToken }),
     successfulCreateReviewForRestaurantRequest: (data) => ({ type: types.CREATE_REVIEW_FOR_RESTAURANT_SUCCESS, data }),
