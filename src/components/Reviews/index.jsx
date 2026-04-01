@@ -43,7 +43,7 @@ const Reviews = ({ params: { restaurantId }, reviews, nextCursor, reviewsError, 
                     {requestingReviews && <FrySpinner />}
                     {nextCursor
                         ? <div ref={sentinelRef} />
-                        : <p>End of reviews.</p>
+                        : <p style={{textAlign: 'center', fontSize: '1.1rem', fontWeight: 'bold'}}>End of reviews.</p>
                     }
                 </>
             )
