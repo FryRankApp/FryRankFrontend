@@ -3,15 +3,18 @@ import { Breadcrumb, Button, Banner, FrySpinner, LinkButton, RestaurantHeader, R
 
 const propTypes = {
     reviews: PropTypes.array.isRequired,
+    nextCursor: PropTypes.string,
     reviewsError: PropTypes.string.isRequired,
     restaurantsError: PropTypes.string.isRequired,
     currentRestaurants: PropTypes.object.isRequired,
     averageScore: PropTypes.number.isRequired,
     requestingRestaurantDetails: PropTypes.bool.isRequired,
+    requestingReviews: PropTypes.bool.isRequired,
     loggedIn: PropTypes.bool.isRequired,
+    getReviews: PropTypes.func.isRequired,
 };
 
-const Reviews = ({ params: { restaurantId }, reviews, reviewsError, restaurantsError, currentRestaurants, requestingRestaurantDetails, averageScore, loggedIn }) => {
+const Reviews = ({ params: { restaurantId }, reviews, nextCursor, reviewsError, restaurantsError, currentRestaurants, requestingRestaurantDetails, requestingReviews, averageScore, loggedIn, getReviews }) => {
     const reviewsBody = () => {
         if (!reviews) {
             return <FrySpinner />;
@@ -19,7 +22,12 @@ const Reviews = ({ params: { restaurantId }, reviews, reviewsError, restaurantsE
             return <p>No reviews exist for this restaurant yet. Why don't you write the first one?</p>
         } else {
             return (
-                <ReviewCardList reviews={reviews}/>
+                <ReviewCardList
+                    reviews={reviews}
+                    nextCursor={nextCursor}
+                    requestingReviews={requestingReviews}
+                    onLoadMore={() => getReviews(restaurantId, nextCursor)}
+                />
             )
         }
     }
