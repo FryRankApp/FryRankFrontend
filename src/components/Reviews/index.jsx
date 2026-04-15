@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import { PropTypes } from 'prop-types';
 import { Breadcrumb, Button, Banner, FrySpinner, LinkButton, RestaurantHeader, ReviewCardList } from '../Common';
 
@@ -16,21 +15,6 @@ const propTypes = {
 };
 
 const Reviews = ({ params: { restaurantId }, reviews, nextCursor, reviewsError, restaurantsError, currentRestaurants, requestingRestaurantDetails, requestingReviews, averageScore, loggedIn, getReviews }) => {
-    const sentinelRef = useRef(null);
-
-    useEffect(() => {
-        if (!sentinelRef.current || !nextCursor || requestingReviews) return;
-
-        const observer = new IntersectionObserver(([entry]) => {
-            if (entry.isIntersecting) {
-                getReviews(restaurantId, nextCursor);
-            }
-        });
-
-        observer.observe(sentinelRef.current);
-        return () => observer.disconnect();
-    }, [nextCursor, requestingReviews, restaurantId, getReviews]);
-
     const reviewsBody = () => {
         if (!reviews) {
             return <FrySpinner />;
@@ -38,14 +22,12 @@ const Reviews = ({ params: { restaurantId }, reviews, nextCursor, reviewsError, 
             return <p>No reviews exist for this restaurant yet. Why don't you write the first one?</p>
         } else {
             return (
-                <>
-                    <ReviewCardList reviews={reviews}/>
-                    {requestingReviews && <FrySpinner />}
-                    {nextCursor
-                        ? <div ref={sentinelRef} />
-                        : <p style={{textAlign: 'center', fontSize: '1.1rem', fontWeight: 'bold'}}>End of reviews.</p>
-                    }
-                </>
+                <ReviewCardList
+                    reviews={reviews}
+                    nextCursor={nextCursor}
+                    requestingReviews={requestingReviews}
+                    onLoadMore={() => getReviews(restaurantId, nextCursor)}
+                />
             )
         }
     }

@@ -50,9 +50,7 @@ export default (state = initialState, action) => {
         case types.GET_RESTAURANT_REVIEWS_SUCCESS: {
             return {
                 ...state,
-                reviews: action.isLoadMore
-                    ? [...(state.reviews || []), ...action.reviewsData.reviews]
-                    : action.reviewsData.reviews,
+                reviews: [...(state.reviews || []), ...action.reviewsData.reviews],
                 nextCursor: action.nextCursor,
                 averageScore: action.averageScore,
                 requestingReviews: false,
@@ -78,9 +76,7 @@ export default (state = initialState, action) => {
         case types.GET_ACCOUNT_REVIEWS_SUCCESS: {
             return {
                 ...state,
-                reviews: action.isLoadMore
-                    ? [...(state.reviews || []), ...action.reviewsData.reviews]
-                    : action.reviewsData.reviews,
+                reviews: [...(state.reviews || []), ...action.reviewsData.reviews],
                 nextCursor: action.nextCursor,
                 requestingReviews: false,
                 error: ''
@@ -213,10 +209,10 @@ export default (state = initialState, action) => {
 
 export const reviewsActions = {
     startGetAllReviewsForRestaurantRequest: (restaurantId, cursor = null) => ({ type: types.GET_RESTAURANT_REVIEWS_REQUEST, restaurantId, cursor }),
-    successfulGetAllReviewsForRestaurantRequest: (reviewsData, averageScore, nextCursor, isLoadMore) => ({ type: types.GET_RESTAURANT_REVIEWS_SUCCESS, reviewsData, averageScore, nextCursor, isLoadMore }),
+    successfulGetAllReviewsForRestaurantRequest: (reviewsData, averageScore, nextCursor) => ({ type: types.GET_RESTAURANT_REVIEWS_SUCCESS, reviewsData, averageScore, nextCursor }),
     failedGetAllReviewsForRestaurantRequest: error => ({ type: types.GET_RESTAURANT_REVIEWS_FAILURE, error }),
     startGetAllReviewsForAccountRequest: (accountId, cursor = null) => ({ type: types.GET_ACCOUNT_REVIEWS_REQUEST, accountId, cursor }),
-    successfulGetAllReviewsForAccountRequest: (reviewsData, nextCursor, isLoadMore) => ({ type: types.GET_ACCOUNT_REVIEWS_SUCCESS, reviewsData, nextCursor, isLoadMore }),
+    successfulGetAllReviewsForAccountRequest: (reviewsData, nextCursor) => ({ type: types.GET_ACCOUNT_REVIEWS_SUCCESS, reviewsData, nextCursor }),
     failedGetAllReviewsForAccountRequest: error => ({ type: types.GET_ACCOUNT_REVIEWS_FAILURE, error }),
     startCreateReviewForRestaurantRequest: (review, idToken) => ({ type: types.CREATE_REVIEW_FOR_RESTAURANT_REQUEST, review, idToken }),
     successfulCreateReviewForRestaurantRequest: (data) => ({ type: types.CREATE_REVIEW_FOR_RESTAURANT_SUCCESS, data }),

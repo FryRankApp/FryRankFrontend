@@ -18,7 +18,6 @@ export function* callGetAllReviewsForRestaurant({ restaurantId, cursor }) {
             data,
             !_.isEmpty(aggregateReviewsData.data.restaurantIdToRestaurantInformation) ? aggregateReviewsData.data.restaurantIdToRestaurantInformation[restaurantId].avgScore : null,
             data.nextCursor ?? null,
-            cursor != null,
         ));
     } catch (err) {
         yield put(reviewsActions.failedGetAllReviewsForRestaurantRequest(err.response.data.message));
@@ -33,7 +32,6 @@ export function* callGetAllReviewsForAccount({ accountId, cursor }) {
         yield put(reviewsActions.successfulGetAllReviewsForAccountRequest(
             data,
             data.nextCursor ?? null,
-            cursor != null,
         ));
     } catch (err) {
         yield put(reviewsActions.failedGetAllReviewsForAccountRequest(err.response.data.message));
