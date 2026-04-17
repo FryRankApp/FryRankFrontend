@@ -3,14 +3,16 @@ import { Banner, FrySpinner, ReviewCardList } from '../Common';
 
 const propTypes = {
     reviews: PropTypes.array.isRequired,
+    nextCursor: PropTypes.string,
     reviewsError: PropTypes.string.isRequired,
     accountId: PropTypes.string.IsRequired,
     currentRestaurants: PropTypes.object.isRequired,
     requestingReviews: PropTypes.bool.isRequired,
     restaurantsError: PropTypes.bool.isRequired,
+    getReviews: PropTypes.func.isRequired,
 };
 
-const Critic = ({ params: { accountId }, reviews, reviewsError, currentRestaurants, requestingReviews, restaurantsError, otherUserSettings }) => {
+const Critic = ({ params: { accountId }, reviews, nextCursor, reviewsError, currentRestaurants, requestingReviews, restaurantsError, otherUserSettings, getReviews }) => {
     const reviewsBody = () => {
         if (!reviews) {
             return <FrySpinner />;
@@ -21,6 +23,9 @@ const Critic = ({ params: { accountId }, reviews, reviewsError, currentRestauran
                 <ReviewCardList
                     reviews={reviews}
                     currentRestaurants={currentRestaurants}
+                    nextCursor={nextCursor}
+                    requestingReviews={requestingReviews}
+                    onLoadMore={() => getReviews(accountId, nextCursor)}
                 />
             )
         }

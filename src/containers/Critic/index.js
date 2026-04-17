@@ -10,6 +10,7 @@ import {userSettingsActions} from "../../redux/reducers/userSettings";
 const mapStateToProps = (state) => {
     return {
         reviews: state.reviewsReducer.reviews,
+        nextCursor: state.reviewsReducer.nextCursor,
         requestingReviews: state.reviewsReducer.requestingReviews,
         reviewsError: state.reviewsReducer.error,
         loggedIn: state.userReducer.loggedIn,

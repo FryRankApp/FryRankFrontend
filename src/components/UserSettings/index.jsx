@@ -14,10 +14,11 @@ const propTypes = {
     setUserSettings: PropTypes.func.isRequired,
     updateCurrentUserSettings: PropTypes.func.isRequired,
     error: PropTypes.string,
-    successfulSetUserSettings: PropTypes.string
+    successfulSetUserSettings: PropTypes.string,
+    idToken: PropTypes.string
 }
 
-const UserSettings = ({ userSettings, currentUserSettings, loggedIn, setUserSettings, updateCurrentUserSettings, error, successfulSetUserSettings }) => {
+const UserSettings = ({ userSettings, currentUserSettings, loggedIn, setUserSettings, updateCurrentUserSettings, error, successfulSetUserSettings, idToken }) => {
     return (
         <div>
         {
@@ -44,7 +45,7 @@ const UserSettings = ({ userSettings, currentUserSettings, loggedIn, setUserSett
                     <Button children='Update'
                             color='danger'
                             onClick={(event) => {
-                                setUserSettings(currentUserSettings)
+                                setUserSettings(currentUserSettings, idToken)
                             }}
                     />
                 </div>

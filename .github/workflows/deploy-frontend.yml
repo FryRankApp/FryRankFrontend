@@ -37,6 +37,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Resolve deploy targets (Beta)
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          BUCKET_NAME="fryrank-app-spa-bucket-${ACCOUNT_ID}"
+          echo "ACCOUNT_ID=$ACCOUNT_ID" >> "$GITHUB_ENV"
+          echo "BUCKET_NAME=$BUCKET_NAME" >> "$GITHUB_ENV"
+
       - name: Fetch SSM parameters and build
         run: |
           echo "Fetching encrypted values from SSM..."
@@ -56,14 +63,25 @@ jobs:
       - name: Deploy to S3 (Beta)
         run: |
           echo "Uploading to S3..."
-
-          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           echo "Detected AWS Account ID: $ACCOUNT_ID"
-
-          BUCKET_NAME="fryrank-app-spa-bucket-${ACCOUNT_ID}"
           echo "Using bucket: s3://$BUCKET_NAME/"
 
           aws s3 sync build/ s3://$BUCKET_NAME/ --delete || echo "S3 sync failed"
+
+      - name: Invalidate CloudFront cache (Beta)
+        run: |
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Origins.Items[?contains(DomainName, '${BUCKET_NAME}.s3')]].Id | [0]" \
+            --output text)
+
+          if [ -z "$DISTRIBUTION_ID" ] || [ "$DISTRIBUTION_ID" = "None" ]; then
+            echo "Error: Could not find a CloudFront distribution for origin containing '${BUCKET_NAME}.s3'"
+            exit 1
+          fi
+
+          aws cloudfront create-invalidation \
+            --distribution-id "$DISTRIBUTION_ID" \
+            --paths "/*"
 
   deploy-prod:
     name: "Deploy to Production"
@@ -91,6 +109,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Resolve deploy targets (Prod)
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          BUCKET_NAME="fryrank-app-spa-bucket-${ACCOUNT_ID}"
+          echo "ACCOUNT_ID=$ACCOUNT_ID" >> "$GITHUB_ENV"
+          echo "BUCKET_NAME=$BUCKET_NAME" >> "$GITHUB_ENV"
+
       - name: Fetch SSM parameters and build
         run: |
           echo "Fetching encrypted values from SSM..."
@@ -110,12 +135,23 @@ jobs:
       - name: Deploy to S3 (Prod)
         run: |
           echo "Uploading to S3..."
-
-          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           echo "Detected AWS Account ID: $ACCOUNT_ID"
-
-          BUCKET_NAME="fryrank-app-spa-bucket-${ACCOUNT_ID}"
           echo "Using bucket: s3://$BUCKET_NAME/"
 
           aws s3 sync build/ s3://$BUCKET_NAME/ --delete || echo "S3 sync failed"
+
+      - name: Invalidate CloudFront cache (Prod)
+        run: |
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Origins.Items[?contains(DomainName, '${BUCKET_NAME}.s3')]].Id | [0]" \
+            --output text)
+
+          if [ -z "$DISTRIBUTION_ID" ] || [ "$DISTRIBUTION_ID" = "None" ]; then
+            echo "Error: Could not find a CloudFront distribution for origin containing '${BUCKET_NAME}.s3'"
+            exit 1
+          fi
+
+          aws cloudfront create-invalidation \
+            --distribution-id "$DISTRIBUTION_ID" \
+            --paths "/*"
 

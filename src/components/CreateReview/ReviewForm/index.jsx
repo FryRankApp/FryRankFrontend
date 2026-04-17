@@ -12,14 +12,13 @@ const propTypes = {
     createReview: PropTypes.func.isRequired,
     loggedIn: PropTypes.bool.isRequired,
     username: PropTypes.string.isRequired,
-    accountId: PropTypes.string.isRequired,
     formErrors: PropTypes.object.isRequired,
     setFormErrors: PropTypes.func.isRequired,
     deleteFormError: PropTypes.func.isRequired,
     idToken: PropTypes.string,
 };
 
-const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurrentReview, loggedIn, username, accountId, formErrors, setFormErrors, deleteFormError, idToken }) => {
+const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurrentReview, loggedIn, username, formErrors, setFormErrors, deleteFormError, idToken }) => {
 
     const validateForm = () => {
         const newErrors = validateReview(currentReview);
@@ -40,9 +39,6 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
         <Form
             onSubmit={handleSubmit}
             onChange={(event) => {
-                if (!currentReview.accountId && accountId) {
-                    updateCurrentReview('accountId', accountId);
-                }
                 updateCurrentReview(event.target.name, event.target.value);
 
                 // Clear errors when user types in form fields.
@@ -70,9 +66,6 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
                         id="scoreInput"
                         value={currentReview.score || ''}
                         onChange={(event) => {
-                            if (!currentReview.accountId && accountId) {
-                                updateCurrentReview('accountId', accountId);
-                            }
                             updateCurrentReview(event.target.name, event.target.value);
 
                             // Clear errors when user types in form fields.

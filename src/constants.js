@@ -15,8 +15,6 @@ export const AGGREGATE_INFORMATION_API_PATH = `${BACKEND_SERVICE_PATH}/reviews/a
                                                
 export const FRENCH_FRIES_TEXT_QUERY = "french fries";
 
-export const REVIEW_PROPERTY_ISO_DATE_TIME = "isoDateTime";
-
 export const WELCOME_MESSAGE = "Bonjour, my name is Monsieur LeFry. "
     + "Have you ever wondered what it's like to immerse yourself in the world of French Fries, traversing countless eateries, "
     + "meticulously sampling each fry, and dissecting their every nuance? This is my world, the world of a French Fry food "
