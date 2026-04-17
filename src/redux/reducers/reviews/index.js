@@ -19,9 +19,9 @@ export const types = {
     SET_REVIEWS: "SET_REVIEWS",
     SET_FORM_ERROR: "SET_FORM_ERROR",
     DELETE_FORM_ERROR: "DELETE_FORM_ERROR",
-    INCREMENT_LIKE_COUNT: "INCREMENT_LIKE_COUNT",
     LIKE_REVIEW_REQUEST: "LIKE_REVIEW_REQUEST",
-    ROLLBACK_LIKE_REVIEW: "ROLLBACK_LIKE_REVIEW"
+    TOGGLE_REACTION_SUCCESS: "TOGGLE_REACTION_SUCCESS",
+    TOGGLE_REACTION_FAILURE: "TOGGLE_REACTION_FAILURE"
 }
 
 export const initialState = {
@@ -205,11 +205,11 @@ export default (state = initialState, action) => {
             };
         }
 
-        case types.INCREMENT_LIKE_COUNT: {
-            const { reviewId } = action;
+        case types.TOGGLE_REACTION_SUCCESS: {
+            const { reviewId, reactionCounts, myReactions } = action;
             const updatedReviews = state?.reviews?.map(review =>
                 review.reviewId === reviewId
-                    ? { ...review, likeCount: (review.likeCount ?? 0) + 1 }
+                    ? { ...review, reactionCounts, myReactions }
                     : review
             );
             return {
@@ -218,16 +218,10 @@ export default (state = initialState, action) => {
             };
         }
 
-        case types.ROLLBACK_LIKE_REVIEW: {
-            const { reviewId } = action;
-            const updatedReviews = state?.reviews?.map(review =>
-                review.reviewId === reviewId
-                    ? { ...review, likeCount: Math.max(0, (review.likeCount ?? 1) - 1) }
-                    : review
-            );
+        case types.TOGGLE_REACTION_FAILURE: {
             return {
                 ...state,
-                reviews: updatedReviews
+                error: action.error || state.error
             };
         }
 
@@ -255,7 +249,19 @@ export const reviewsActions = {
     setReviews: (reviews) => ({ type: types.SET_REVIEWS, payload: reviews }),
     setFormErrors: (errors) => ({ type: types.SET_FORM_ERROR, errors }),
     deleteFormError: (errorKey) => ({ type: types.DELETE_FORM_ERROR, errorKey }),
-    incrementLikeCount: (reviewId) => ({ type: types.INCREMENT_LIKE_COUNT, reviewId }),
-    startLikeReviewRequest: (reviewId, likeCount, idToken) => ({ type: types.LIKE_REVIEW_REQUEST, reviewId, likeCount, idToken }),
-    rollbackLikeReview: (reviewId) => ({ type: types.ROLLBACK_LIKE_REVIEW, reviewId })
+    startLikeReviewRequest: (reviewId, accountId, reactionType, shouldAdd, idToken) => ({
+        type: types.LIKE_REVIEW_REQUEST,
+        reviewId,
+        accountId,
+        reactionType,
+        shouldAdd,
+        idToken
+    }),
+    successfulToggleReactionRequest: (reviewId, reactionCounts, myReactions) => ({
+        type: types.TOGGLE_REACTION_SUCCESS,
+        reviewId,
+        reactionCounts,
+        myReactions
+    }),
+    failedToggleReactionRequest: (error) => ({ type: types.TOGGLE_REACTION_FAILURE, error })
 }

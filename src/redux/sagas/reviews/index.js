@@ -80,7 +80,7 @@ export function* callDeleteReviewForRestaurantRequest( {reviewId, idToken} ){
 
 const REVIEWS_LIKE_API_PATH = `${REVIEWS_API_PATH}/like`;
 
-export function* callLikeReview({ reviewId, likeCount, idToken }) {
+export function* callLikeReview({ reviewId, accountId, reactionType, shouldAdd, idToken }) {
     try {
         if (!idToken) {
             throw new Error('User must be signed in to like a review');
@@ -91,9 +91,20 @@ export function* callLikeReview({ reviewId, likeCount, idToken }) {
                 'Content-Type': 'application/json'
             }
         };
-        yield axios.put(REVIEWS_LIKE_API_PATH, { reviewId, likeCount }, config);
+        const body = {
+            accountId,
+            reviewId,
+            reactionType,
+            action: shouldAdd ? "ADD" : "REMOVE"
+        };
+        const { data } = yield axios.post(REVIEWS_LIKE_API_PATH, body, config);
+        yield put(reviewsActions.successfulToggleReactionRequest(
+            data.reviewId,
+            data.reactionCounts,
+            data.myReactions
+        ));
     } catch (err) {
-        yield put(reviewsActions.rollbackLikeReview(reviewId));
+        yield put(reviewsActions.failedToggleReactionRequest(err.response?.data?.message || err.message));
     }
 }
 

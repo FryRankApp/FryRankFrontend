@@ -10,7 +10,7 @@ import {
     PATH_VARIABLE_RESTAURANT_ID
 } from '../../../constants.js'
 import '../style.css'
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaThumbsUp, FaThumbsDown, FaHeart } from "react-icons/fa";
 import EditReviewModal from '../../EditReview/EditReviewModal.jsx';
 import DeleteReviewModal from '../../DeleteReview/DeleteReviewModal.jsx';
 import { reviewsActions } from '../../../redux/reducers/reviews';
@@ -31,8 +31,8 @@ const ReviewCard = ({ review, restaurant }) => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const idToken = useSelector((state) => state.userReducer.idToken);
     const displayReview = updatedReview ?? review;
-    const currentLikeCount = displayReview?.likeCount ?? review.likeCount ?? 0;
-    const isDisabled=false;
+    const reactionCounts = displayReview?.reactionCounts || {};
+    const myReactions = displayReview?.myReactions || {};
   
     const editSave = useCallback(()=>{
         setIsEditModalOpen((prev)=>!prev);
@@ -41,6 +41,26 @@ const ReviewCard = ({ review, restaurant }) => {
     const deleteReview = useCallback(()=>{
         setIsDeleteModalOpen((prev)=>!prev);
     },[])
+
+    const onToggleReaction = useCallback((reactionType) => {
+        if (!loggedIn || !idToken) {
+            return;
+        }
+        const currentlyOn = !!myReactions?.[
+            reactionType === "THUMBS_UP"
+                ? "thumbsUp"
+                : reactionType === "THUMBS_DOWN"
+                    ? "thumbsDown"
+                    : "heart"
+        ];
+        dispatch(reviewsActions.startLikeReviewRequest(
+            displayReview.reviewId,
+            displayReview.accountId,
+            reactionType,
+            !currentlyOn,
+            idToken
+        ));
+    }, [dispatch, loggedIn, idToken, myReactions, displayReview]);
 
     return (
         <>
@@ -88,6 +108,38 @@ const ReviewCard = ({ review, restaurant }) => {
                     <CardText>
                         {review.body}
                     </CardText>
+                    <div className="d-flex gap-3 align-items-center mb-2">
+                        <button
+                            type="button"
+                            className="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-1"
+                            onClick={() => onToggleReaction("THUMBS_UP")}
+                            disabled={!loggedIn}
+                            title={loggedIn ? "Toggle thumbs up" : "Sign in to react"}
+                        >
+                            <FaThumbsUp color={myReactions.thumbsUp ? "#0d6efd" : "#6c757d"} />
+                            <span>{reactionCounts.thumbsUp ?? 0}</span>
+                        </button>
+                        <button
+                            type="button"
+                            className="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-1"
+                            onClick={() => onToggleReaction("THUMBS_DOWN")}
+                            disabled={!loggedIn}
+                            title={loggedIn ? "Toggle thumbs down" : "Sign in to react"}
+                        >
+                            <FaThumbsDown color={myReactions.thumbsDown ? "#dc3545" : "#6c757d"} />
+                            <span>{reactionCounts.thumbsDown ?? 0}</span>
+                        </button>
+                        <button
+                            type="button"
+                            className="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-1"
+                            onClick={() => onToggleReaction("HEART")}
+                            disabled={!loggedIn}
+                            title={loggedIn ? "Toggle heart" : "Sign in to react"}
+                        >
+                            <FaHeart color={myReactions.heart ? "#dc3545" : "#6c757d"} />
+                            <span>{reactionCounts.heart ?? 0}</span>
+                        </button>
+                    </div>
                     {review.isoDateTime &&
                         <CardSubtitle className="mb-2 text-muted" style={{fontStyle: "italic"}} tag="h6">
                             {new Date(review.isoDateTime).toLocaleString()}
