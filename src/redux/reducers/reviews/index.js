@@ -18,7 +18,10 @@ export const types = {
     RESET_REVIEWS: "RESET_REVIEWS",
     SET_REVIEWS: "SET_REVIEWS",
     SET_FORM_ERROR: "SET_FORM_ERROR",
-    DELETE_FORM_ERROR: "DELETE_FORM_ERROR"
+    DELETE_FORM_ERROR: "DELETE_FORM_ERROR",
+    LIKE_REVIEW_REQUEST: "LIKE_REVIEW_REQUEST",
+    TOGGLE_REACTION_SUCCESS: "TOGGLE_REACTION_SUCCESS",
+    TOGGLE_REACTION_FAILURE: "TOGGLE_REACTION_FAILURE"
 }
 
 export const initialState = {
@@ -199,7 +202,27 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 formErrors: newFormErrors
-            }
+            };
+        }
+
+        case types.TOGGLE_REACTION_SUCCESS: {
+            const { reviewId, reactionCounts, myReactions } = action;
+            const updatedReviews = state?.reviews?.map(review =>
+                review.reviewId === reviewId
+                    ? { ...review, reactionCounts, myReactions }
+                    : review
+            );
+            return {
+                ...state,
+                reviews: updatedReviews
+            };
+        }
+
+        case types.TOGGLE_REACTION_FAILURE: {
+            return {
+                ...state,
+                error: action.error || state.error
+            };
         }
 
         default:
@@ -225,5 +248,20 @@ export const reviewsActions = {
     resetReviews: () => ({ type: types.RESET_REVIEWS }),
     setReviews: (reviews) => ({ type: types.SET_REVIEWS, payload: reviews }),
     setFormErrors: (errors) => ({ type: types.SET_FORM_ERROR, errors }),
-    deleteFormError: (errorKey) => ({ type: types.DELETE_FORM_ERROR, errorKey })
+    deleteFormError: (errorKey) => ({ type: types.DELETE_FORM_ERROR, errorKey }),
+    startLikeReviewRequest: (reviewId, accountId, reactionType, shouldAdd, idToken) => ({
+        type: types.LIKE_REVIEW_REQUEST,
+        reviewId,
+        accountId,
+        reactionType,
+        shouldAdd,
+        idToken
+    }),
+    successfulToggleReactionRequest: (reviewId, reactionCounts, myReactions) => ({
+        type: types.TOGGLE_REACTION_SUCCESS,
+        reviewId,
+        reactionCounts,
+        myReactions
+    }),
+    failedToggleReactionRequest: (error) => ({ type: types.TOGGLE_REACTION_FAILURE, error })
 }

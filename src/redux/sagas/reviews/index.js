@@ -78,9 +78,40 @@ export function* callDeleteReviewForRestaurantRequest( {reviewId, idToken} ){
     }
 }
 
+const REVIEWS_LIKE_API_PATH = `${REVIEWS_API_PATH}/like`;
+
+export function* callLikeReview({ reviewId, accountId, reactionType, shouldAdd, idToken }) {
+    try {
+        if (!idToken) {
+            throw new Error('User must be signed in to like a review');
+        }
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${idToken}`,
+                'Content-Type': 'application/json'
+            }
+        };
+        const body = {
+            accountId,
+            reviewId,
+            reactionType,
+            action: shouldAdd ? "ADD" : "REMOVE"
+        };
+        const { data } = yield axios.post(REVIEWS_LIKE_API_PATH, body, config);
+        yield put(reviewsActions.successfulToggleReactionRequest(
+            data.reviewId,
+            data.reactionCounts,
+            data.myReactions
+        ));
+    } catch (err) {
+        yield put(reviewsActions.failedToggleReactionRequest(err.response?.data?.message || err.message));
+    }
+}
+
 export default function* watchReviewsRequest() {
     yield takeEvery(types.GET_RESTAURANT_REVIEWS_REQUEST, callGetAllReviewsForRestaurant);
     yield takeEvery(types.GET_ACCOUNT_REVIEWS_REQUEST, callGetAllReviewsForAccount);
     yield takeEvery(types.CREATE_REVIEW_FOR_RESTAURANT_REQUEST, callCreateReviewForRestaurant);
     yield takeEvery(types.DELETE_REVIEW_FOR_RESTAURANT_REQUEST, callDeleteReviewForRestaurantRequest);
+    yield takeEvery(types.LIKE_REVIEW_REQUEST, callLikeReview);
 }
