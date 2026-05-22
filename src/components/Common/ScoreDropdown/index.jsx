@@ -1,17 +1,16 @@
 import React, { memo } from 'react';
-import { FormGroup, Label, Input } from 'reactstrap';
 
 const ScoreDropdown = memo(({name, id, labelName, value='', onChange = () => {}}) => {
     return (
-        <FormGroup> 
-            <Label for="scoreInput">{labelName}</Label> 
-            <Input 
+        <div className="mb-3"> 
+            <label htmlFor="scoreInput" className="mb-1 block text-sm font-medium text-slate-700">{labelName}</label> 
+            <select
                 type="select" 
                 name={name}
                 id={id}
-                defaultValue = {value}
+                value={value}
                 onChange={onChange} 
-                className="form-select" 
+                className="w-full rounded-md border border-slate-300 px-3 py-2" 
             > 
                 <option value="">Select a {name}</option> 
                 <option value="10">10</option> 
@@ -24,8 +23,8 @@ const ScoreDropdown = memo(({name, id, labelName, value='', onChange = () => {}}
                 <option value="3">3</option> 
                 <option value="2">2</option> 
                 <option value="1">1</option> 
-            </Input> 
-        </FormGroup>
+            </select> 
+        </div>
     );
 });
 

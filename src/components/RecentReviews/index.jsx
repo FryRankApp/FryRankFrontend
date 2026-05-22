@@ -53,13 +53,13 @@ const RecentReviews = () => {
     }
 
     return (
-        <div>
-            <h1>Recent Reviews</h1>
+        <section className="w-full max-w-4xl rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm sm:p-6">
+            <h1 className="mb-3 text-3xl font-bold text-slate-900">Recent Reviews</h1>
             <ReviewCardList
                 reviews={recentReviews}
                 currentRestaurants={restaurantData} // Pass the restaurantMap to the ReviewCardList
             />
-        </div>
+        </section>
     );
 };
 

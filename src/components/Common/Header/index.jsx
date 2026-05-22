@@ -1,8 +1,6 @@
 import {useState} from 'react'
 import  GoogleLogin from '../../../containers/Common/GoogleLogin';
 import logo from '../../../FryRankLogo.png';
-import style from "./style.module.css"
-import {Collapse, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink} from "reactstrap";
 import {Link} from "react-router-dom";
 
 export default function Header({loggedIn}) {
@@ -10,63 +8,27 @@ export default function Header({loggedIn}) {
     const toggle = () => setIsOpen(!isOpen);
 
     return (
-        <div className={style.Header}>
-            <Navbar className="p-lg-2 sign" dark expand="md">               
-                <NavbarBrand href='/'>
+        <header className="sticky top-0 z-40 w-full border-b border-white/50 bg-white/80 px-4 py-3 backdrop-blur-md">
+            <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div className="flex items-center justify-between">
                     <Link to="/">
-                        <img src={logo} className={style.FryRank} alt="FryRank" />
+                        <img src={logo} className="w-[min(14rem,38vw)] drop-shadow-sm" alt="FryRank" />
                     </Link>
-                </NavbarBrand>
-                
-                <NavbarToggler onClick={toggle} />
-                
-                <Collapse isOpen={isOpen} navbar>
-                    <Nav className="me-auto" navbar>
-                        <NavItem>  
-                            <NavLink>                      
-                                <Link to='/restaurants'>
-                                    <h4> Restaurants </h4>
-                                </Link> 
-                            </NavLink>                         
-                        </NavItem>
-
-                        <NavItem>  
-                            <NavLink>                      
-                                <Link to='/recent-reviews'>
-                                    <h4> Recent Reviews </h4>
-                                </Link> 
-                            </NavLink>                         
-                        </NavItem>
-                        
-                        <NavItem> 
-                            <NavLink href="https://www.etsy.com/shop/fryrank/" target="_blank" rel="noopener noreferrer">
-                                <h4> Merch Shop </h4>
-                            </NavLink>
-                        </NavItem>
-
-                        <NavItem>  
-                            <NavLink href="https://buy.stripe.com/6oU4gygu35Qt9utf351kA00" target="_blank" rel="noopener noreferrer">
-                                <h4> Donate </h4>
-                            </NavLink>
-                        </NavItem>
-
-                        {
-                            loggedIn &&
-                            <NavItem>
-                                <NavLink>
-                                    <Link to="/userSettings">
-                                        <h4>User Settings</h4>
-                                    </Link>
-                                </NavLink>
-                            </NavItem>
-                        }
-                    </Nav>
-                </Collapse>                      
-            </Navbar> 
-            
-            <div className={style.GoogleLoginContainer}>
-                <GoogleLogin/>   
+                    <button className="rounded-full border border-slate-300 px-3 py-1 text-slate-800 md:hidden" onClick={toggle}>
+                        Menu
+                    </button>
+                </div>
+                <nav className={`${isOpen ? "flex" : "hidden"} flex-col gap-2 rounded-2xl bg-slate-50 p-3 md:flex md:flex-row md:items-center md:gap-5 md:bg-transparent md:p-0`}>
+                    <Link className="text-base font-semibold text-slate-800 hover:text-red-600" to='/restaurants'>Restaurants</Link>
+                    <Link className="text-base font-semibold text-slate-800 hover:text-red-600" to='/recent-reviews'>Recent Reviews</Link>
+                    <a className="text-base font-semibold text-slate-800 hover:text-red-600" href="https://www.etsy.com/shop/fryrank/" target="_blank" rel="noopener noreferrer">Merch Shop</a>
+                    <a className="text-base font-semibold text-slate-800 hover:text-red-600" href="https://buy.stripe.com/6oU4gygu35Qt9utf351kA00" target="_blank" rel="noopener noreferrer">Donate</a>
+                    {loggedIn && <Link className="text-base font-semibold text-slate-800 hover:text-red-600" to="/userSettings">User Settings</Link>}
+                </nav>
             </div>
-        </div>
+            <div className="mx-auto mt-2 flex w-full max-w-6xl justify-end px-2">
+                <GoogleLogin/>
+            </div>
+        </header>
     )
 }

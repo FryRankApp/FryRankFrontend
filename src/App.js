@@ -3,21 +3,17 @@ import {useSelector} from "react-redux";
 
 import { Header } from './components/Common';
 import { routes } from "./routes"
-import { Container, Row, Col } from 'reactstrap'
 import { APIProvider } from '@vis.gl/react-google-maps';
 
 function App() {
   const loggedIn = useSelector((state) => state.userReducer.loggedIn);
   return (
-    <div>
+    <div className="min-h-screen bg-slate-50">
       <Router>
       <APIProvider apiKey={process.env.REACT_APP_GOOGLE_API_KEY}>
         <Header loggedIn={loggedIn}/>
-        <Container>
-          <Row>
-            <Col />
-            <Col xs="auto">
-              <div class="d-flex justify-content-center">
+        <main className="mx-auto flex w-full max-w-6xl justify-center px-3 py-6 sm:px-5">
+              <div className="flex w-full justify-center">
                 <Routes>
                   {routes.map((route, key) => (
                     <Route
@@ -29,10 +25,7 @@ function App() {
                   ))}
                 </Routes>
               </div>
-            </Col>
-            <Col />
-          </Row>
-        </Container>
+        </main>
       </APIProvider>
       </Router>
     </div>

@@ -1,8 +1,8 @@
 import { PropTypes } from 'prop-types';
-import { Button, Input, InputGroup } from 'reactstrap';
 import { useMap } from '@vis.gl/react-google-maps';
+import { Button } from '../../Common';
 
-import { FRENCH_FRIES_TEXT_QUERY, SELECTED_VIEW } from '../../../constants';
+import { SELECTED_VIEW } from '../../../constants';
 
 const propTypes = {
     currentSearchQuery: PropTypes.string.isRequired,
@@ -15,20 +15,19 @@ const SearchInput = ({ getRestaurants, currentSearchQuery, updateSearchQuery, lo
     const map = useMap();
 
     return (
-        <InputGroup
-            className="me-2 my-2"
-            onChange={(event) => {
-                updateSearchQuery(event.target.value);
-            }}
-        >
-            <Input
+        <div className="my-2 flex w-full max-w-3xl flex-col gap-2 sm:flex-row">
+            <input
                 id="searchInput"
                 name="search"
+                className="w-full rounded-md border border-slate-300 px-3 py-2"
                 placeholder="Search for a restaurant"
                 value={currentSearchQuery}
+                onChange={(event) => {
+                    updateSearchQuery(event.target.value);
+                }}
             />
             <Button
-                children='Submit'
+                className="w-full sm:w-auto"
                 color='danger'
                 onClick={(event) => {
                     let searchLocation;
@@ -41,8 +40,8 @@ const SearchInput = ({ getRestaurants, currentSearchQuery, updateSearchQuery, lo
 
                     getRestaurants(currentSearchQuery, searchLocation);
                 }}
-            />
-        </InputGroup>
+            >Submit</Button>
+        </div>
     )
 }
 

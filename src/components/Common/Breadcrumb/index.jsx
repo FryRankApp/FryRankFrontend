@@ -1,6 +1,5 @@
-import { React } from 'react'
+import React, { Fragment } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Breadcrumb as ReactstrapBreadcrumb, BreadcrumbItem as ReactstrapBreadcrumbItem } from 'reactstrap'
 import { pathToPageName } from '../../../routes'
 import { PropTypes } from 'prop-types';
 
@@ -22,25 +21,32 @@ const Breadcrumb = ({aliases}) => {
 
             if(arr.length - 1 === i) {
                 return (
-                    <ReactstrapBreadcrumbItem active>
-                        {pathToPageName[currentLink] ? pathToPageName[currentLink] : crumbDisplayName}
-                    </ReactstrapBreadcrumbItem>
+                    <Fragment key={currentLink}>
+                        <li className="text-slate-600">
+                            {pathToPageName[currentLink] ? pathToPageName[currentLink] : crumbDisplayName}
+                        </li>
+                    </Fragment>
                 )
             }
             else {
                 return (
-                    <ReactstrapBreadcrumbItem>
-                        <Link to={currentLink}>{pathToPageName[currentLink] ? pathToPageName[currentLink] : crumbDisplayName}</Link>
-                    </ReactstrapBreadcrumbItem>
+                    <Fragment key={currentLink}>
+                        <li>
+                            <Link to={currentLink}>{pathToPageName[currentLink] ? pathToPageName[currentLink] : crumbDisplayName}</Link>
+                        </li>
+                        <li aria-hidden="true" className="text-slate-400">/</li>
+                    </Fragment>
                 )
             }
         })
 
     return (
-        <ReactstrapBreadcrumb className='mt-2'>
+        <ol className='mt-2 flex flex-wrap items-center gap-2 text-sm before:content-none'>
             {crumbs}
-        </ReactstrapBreadcrumb>
+        </ol>
     )
 }
+
+Breadcrumb.propTypes = propTypes;
 
 export default Breadcrumb;

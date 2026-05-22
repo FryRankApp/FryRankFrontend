@@ -32,25 +32,26 @@ const GoogleLogin = ({ setUserData, loggedIn, username, accountId, setIdToken })
     const scriptRef = React.useRef(null);
     React.useEffect(() => {
         const script = document.createElement("script");
+        const node = scriptRef.current;
 
         script.src = "https://accounts.google.com/gsi/client";
         script.async = true;
         script.defer = true;
 
-        if (scriptRef.current) {
-            scriptRef.current.appendChild(script);
+        if (node) {
+            node.appendChild(script);
         }
 
         return () => {
-            scriptRef.current?.removeChild(script);
+            node?.removeChild(script);
         };
-    }, [scriptRef]);
+    }, []);
 
     return (
         <div>
             { loggedIn && username &&
                 <div>
-                    <p className="inline me-1 text-black">Hello,</p>
+                    <p className="mr-1 inline text-black">Hello,</p>
                     <Link
                         to={`${PATH_ACCOUNT_REVIEWS}`.replace(PATH_VARIABLE_ACCOUNT_ID, accountId)}
                         style={{"color":"blue", "text-decoration": "underline"}}
