@@ -30,7 +30,7 @@ const Restaurants = ({ restaurantIdsForQuery, error, getRestaurants, currentSear
             <div className="rounded-2xl border border-slate-200 bg-white/85 p-4 shadow-sm sm:p-6">
                 <Breadcrumb />
                 <div className="mt-2">
-                    <h1 className="text-3xl font-bold text-slate-900">Find Fry Spots Near You</h1>
+                    <h1 className="text-3xl font-bold text-slate-900">Find Fries Near You</h1>
                     <p className="mt-1 text-slate-600">Search by restaurant name and switch between map and list views instantly.</p>
                 </div>
                 <SearchInput

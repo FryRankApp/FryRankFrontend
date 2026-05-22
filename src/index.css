@@ -28,6 +28,7 @@ h4 {
 }
 
 .google-map {
-  width: min(450px, 100vw);
-  height: min(800px, 66vh);
+  width: 100%;
+  min-height: 24rem;
+  height: clamp(24rem, 68vh, 52rem);
 }

@@ -36,7 +36,7 @@ const ReviewCard = ({ review, restaurant }) => {
 
     return (
         <>
-            <div className="relative mb-3 w-[92vw] max-w-[42rem] rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="relative mb-3 w-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div>
                         <h3 className="inline-block text-xl font-semibold">
                         {updatedReview?.title || review.title}

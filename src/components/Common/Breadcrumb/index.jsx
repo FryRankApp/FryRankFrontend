@@ -1,4 +1,4 @@
-import { React } from 'react'
+import React, { Fragment } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { pathToPageName } from '../../../routes'
 import { PropTypes } from 'prop-types';
@@ -21,16 +21,21 @@ const Breadcrumb = ({aliases}) => {
 
             if(arr.length - 1 === i) {
                 return (
-                    <li className="text-slate-600">
-                        {pathToPageName[currentLink] ? pathToPageName[currentLink] : crumbDisplayName}
-                    </li>
+                    <Fragment key={currentLink}>
+                        <li className="text-slate-600">
+                            {pathToPageName[currentLink] ? pathToPageName[currentLink] : crumbDisplayName}
+                        </li>
+                    </Fragment>
                 )
             }
             else {
                 return (
-                    <li>
-                        <Link to={currentLink}>{pathToPageName[currentLink] ? pathToPageName[currentLink] : crumbDisplayName}</Link>
-                    </li>
+                    <Fragment key={currentLink}>
+                        <li>
+                            <Link to={currentLink}>{pathToPageName[currentLink] ? pathToPageName[currentLink] : crumbDisplayName}</Link>
+                        </li>
+                        <li aria-hidden="true" className="text-slate-400">/</li>
+                    </Fragment>
                 )
             }
         })
