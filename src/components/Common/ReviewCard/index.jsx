@@ -1,5 +1,4 @@
 import { PropTypes } from 'prop-types';
-import { Card, CardBody, CardSubtitle, CardText, CardTitle } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Score } from '../';
 import { useSelector } from 'react-redux';
@@ -37,56 +36,41 @@ const ReviewCard = ({ review, restaurant }) => {
 
     return (
         <>
-            <Card
-                color="warning"
-                className="mb-2"
-                style={{
-                    maxWidth: "36rem",
-                    width: "90vw"
-                }}
-            >
-                <CardBody>
+            <div className="relative mb-3 w-[92vw] max-w-[42rem] rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div>
-                        <CardTitle tag="h3" style={{ display: "inline-block" }}>
+                        <h3 className="inline-block text-xl font-semibold">
                         {updatedReview?.title || review.title}
-                        </CardTitle>
+                        </h3>
                         <Score size="md" score={review.score} />
                         {isReviewAuthor && ( <FaEdit style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '50px', cursor: 'pointer' }} onClick={editSave} /> )}  
                         {isReviewAuthor && ( <FaTrash style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '15px', cursor: 'pointer' }} onClick={deleteReview} /> )}                      
                     </div>
                     { restaurant &&
                         <div>
-                            <CardSubtitle
-                                className="inline mb-2 me-2 text-danger"
-                                tag="h5"
-                            >
+                            <h5 className="mb-2 mr-2 inline text-lg text-slate-900">
                                 <Link to={`${PATH_RESTAURANT_REVIEWS}`.replace(PATH_VARIABLE_RESTAURANT_ID, restaurant.id)}>{restaurant.displayName.text}</Link>
-                            </CardSubtitle>
-                            <CardText className="inline mb-2">
+                            </h5>
+                            <p className="mb-2 inline text-slate-600">
                                 {restaurant.formattedAddress}
-                            </CardText>
+                            </p>
                         </div>
                     }
-                    <CardSubtitle
-                        className="mb-2 text-muted"
-                        tag="h6"
-                    >
+                    <h6 className="mb-3 text-sm text-slate-500">
                         By: { review.accountId
                             ? <Link to={`${PATH_ACCOUNT_REVIEWS}`.replace(PATH_VARIABLE_ACCOUNT_ID, review.accountId)}>
                                 {review.userMetadata ? review.userMetadata.username : (review.authorId ? review.authorId : review.accountId)}
                             </Link>
                             : <div className="inline">{review.authorId}</div> }
-                    </CardSubtitle>
-                    <CardText>
+                    </h6>
+                    <p className="text-slate-800">
                         {review.body}
-                    </CardText>
+                    </p>
                     {review.isoDateTime &&
-                        <CardSubtitle className="mb-2 text-muted" style={{fontStyle: "italic"}} tag="h6">
+                        <h6 className="mb-2 italic text-slate-500">
                             {new Date(review.isoDateTime).toLocaleString()}
-                        </CardSubtitle>
+                        </h6>
                     }
-                </CardBody>
-            </Card>
+            </div>
             <EditReviewModal 
                 review={review} 
                 save={editSave} 

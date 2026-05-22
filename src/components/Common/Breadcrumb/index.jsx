@@ -1,6 +1,5 @@
 import { React } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Breadcrumb as ReactstrapBreadcrumb, BreadcrumbItem as ReactstrapBreadcrumbItem } from 'reactstrap'
 import { pathToPageName } from '../../../routes'
 import { PropTypes } from 'prop-types';
 
@@ -22,25 +21,27 @@ const Breadcrumb = ({aliases}) => {
 
             if(arr.length - 1 === i) {
                 return (
-                    <ReactstrapBreadcrumbItem active>
+                    <li className="text-slate-600">
                         {pathToPageName[currentLink] ? pathToPageName[currentLink] : crumbDisplayName}
-                    </ReactstrapBreadcrumbItem>
+                    </li>
                 )
             }
             else {
                 return (
-                    <ReactstrapBreadcrumbItem>
+                    <li>
                         <Link to={currentLink}>{pathToPageName[currentLink] ? pathToPageName[currentLink] : crumbDisplayName}</Link>
-                    </ReactstrapBreadcrumbItem>
+                    </li>
                 )
             }
         })
 
     return (
-        <ReactstrapBreadcrumb className='mt-2'>
+        <ol className='mt-2 flex flex-wrap items-center gap-2 text-sm before:content-none'>
             {crumbs}
-        </ReactstrapBreadcrumb>
+        </ol>
     )
 }
+
+Breadcrumb.propTypes = propTypes;
 
 export default Breadcrumb;

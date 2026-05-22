@@ -37,14 +37,15 @@ const Reviews = ({ params: { restaurantId }, reviews, nextCursor, reviewsError, 
         : null;
 
     return (
-        <div>
+        <section className="w-full max-w-4xl">
             <Banner type="error" message={reviewsError} />
             <Banner type="error" message={restaurantsError} />
             { requestingRestaurantDetails && <FrySpinner /> }
             { currentRestaurant &&
-                <div>
+                <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm sm:p-6">
                    <Breadcrumb aliases = {{[currentRestaurant.id]: currentRestaurant.displayName.text}}/>
                    <RestaurantHeader currentRestaurant={currentRestaurant} averageScore={averageScore} />
+                   <div className="mt-2">
                    { loggedIn &&
                        <LinkButton
                            link={'/restaurants/' + currentRestaurant.id + '/create'}
@@ -64,9 +65,10 @@ const Reviews = ({ params: { restaurantId }, reviews, nextCursor, reviewsError, 
                        children='Back to all restaurants'
                        color='secondary'
                    />
+                   </div>
                    {reviewsBody()}
                 </div> }
-        </div>
+        </section>
     )
 }
 

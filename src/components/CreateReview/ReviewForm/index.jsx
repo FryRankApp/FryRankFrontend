@@ -1,5 +1,4 @@
 import { PropTypes } from 'prop-types';
-import { Form, FormGroup, Input, Label } from 'reactstrap';
 
 import { Button, LinkButton, ScoreDropdown, validateReview } from '../../Common';
 import FryposalLoginImage from "../../../Fryposal.png";
@@ -36,7 +35,7 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
 
     return (
         <div>
-        <Form
+        <form
             onSubmit={handleSubmit}
             onChange={(event) => {
                 updateCurrentReview(event.target.name, event.target.value);
@@ -48,18 +47,19 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
             }}
         >
             {loggedIn &&
-                <div><FormGroup>
-                    <Label for="nameInput">
+                <div><div className="mb-3">
+                    <label htmlFor="nameInput" className="mb-1 block text-sm font-medium text-slate-700">
                         Name
-                    </Label>
-                    <Input
+                    </label>
+                    <textarea
+                        className="w-full rounded-md border border-slate-300 px-3 py-2"
                         id="nameInput"
                         name="authorId"
                         value={username}
                         type="textarea"
-                        disabled="true"
+                        disabled
                     />
-                </FormGroup>
+                </div>
                     <ScoreDropdown 
                         labelName="Score" 
                         name="score" 
@@ -74,36 +74,34 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
                             }
                         }}
                     />
-                    {formErrors.score && <p className="text-danger">{formErrors.score}</p>}
+                    {formErrors.score && <p className="text-red-600">{formErrors.score}</p>}
                     
-                    <FormGroup>
-                        <Label for="titleInput">
+                    <div className="mb-3">
+                        <label htmlFor="titleInput" className="mb-1 block text-sm font-medium text-slate-700">
                             Title
-                        </Label>
-                        <Input
+                        </label>
+                        <textarea
+                            className={`w-full rounded-md border px-3 py-2 ${formErrors.title ? "border-red-500" : "border-slate-300"}`}
                             id="titleInput"
                             name="title"
                             value={currentReview.title || ''}
                             placeholder="A title for your review"
-                            type="textarea"
-                            invalid={!!formErrors.title}
                         />
-                    {formErrors.title && <p className="text-danger">{formErrors.title}</p>}
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="bodyInput">
+                    {formErrors.title && <p className="text-red-600">{formErrors.title}</p>}
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="bodyInput" className="mb-1 block text-sm font-medium text-slate-700">
                             Body
-                        </Label>
-                        <Input
+                        </label>
+                        <textarea
+                            className={`w-full rounded-md border px-3 py-2 ${formErrors.body ? "border-red-500" : "border-slate-300"}`}
                             id="bodyInput"
                             name="body"
                             value={currentReview.body || ''}
                             placeholder="Your review text here"
-                            type="textarea"
-                            invalid={!!formErrors.body}
                         />
-                    {formErrors.body && <p className="text-danger">{formErrors.body}</p>}
-                    </FormGroup></div>                
+                    {formErrors.body && <p className="text-red-600">{formErrors.body}</p>}
+                    </div></div>                
             }
             {loggedIn ? <Button
                 children='Submit'
@@ -120,7 +118,7 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
                 children='Back to all reviews'
                 color='secondary'
             />
-        </Form>
+        </form>
         {!loggedIn &&
             <div>
                 <img src={FryposalLoginImage} className="fryposal-login-image" alt="fyposal-login-image"/>

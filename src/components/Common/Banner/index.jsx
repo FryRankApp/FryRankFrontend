@@ -1,5 +1,4 @@
 import { PropTypes } from 'prop-types';
-import { Alert } from 'reactstrap';
 
 const propTypes = {
     message: PropTypes.string.isRequired,
@@ -15,8 +14,12 @@ const typeToProperties = {
 }
 
 const Banner = ({message, type}) => {
+    const bannerStyle = type === "error"
+        ? "border-red-200 bg-red-100 text-red-800"
+        : "border-emerald-200 bg-emerald-100 text-emerald-800";
+
     return message
-        ? <Alert className={"mt-3"} color={`${typeToProperties[type].color}`}>{typeToProperties[type].bannerPrefix}{message}</Alert>
+        ? <div className={`mt-3 rounded-md border px-4 py-3 ${bannerStyle}`}>{typeToProperties[type].bannerPrefix}{message}</div>
         : null;
 }
 

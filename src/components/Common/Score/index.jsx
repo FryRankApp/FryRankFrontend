@@ -1,5 +1,4 @@
 import { PropTypes } from 'prop-types';
-import scoreStyles from "./Score.module.css"
 
 const propTypes = {
     score: PropTypes.number.isRequired,
@@ -11,7 +10,17 @@ const propTypes = {
 }
 
 const Score = ({score, size}) => {
-    return <span className={`${scoreStyles[size]}`}>{score}</span>
+    const styleBySize = {
+        lg: "h-14 w-14 text-2xl",
+        md: "h-9 w-9 text-lg",
+        sm: "h-8 w-8 text-sm"
+    };
+
+    return (
+        <span className={`ml-2 inline-flex items-center justify-center rounded-full border-2 border-red-500 bg-white font-bold text-red-600 shadow-sm ${styleBySize[size]}`}>
+            {score}
+        </span>
+    );
 }
 
 Score.defaultProps = {

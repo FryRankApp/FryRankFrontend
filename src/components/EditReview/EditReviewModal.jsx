@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { reviewsActions } from '../../redux/reducers/reviews';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import { Input, Label, FormGroup } from 'reactstrap';
 import FryposalLoginImage from "../../Fryposal.png";
 import { PropTypes } from 'prop-types';
-import { ScoreDropdown, validateReview } from "../Common";
+import { ScoreDropdown, validateReview, Button } from "../Common";
 
 const propTypes = {
     modal: PropTypes.bool.isRequired,
@@ -19,11 +17,13 @@ export default function EditReviewModal({ modal, signIn, save, review }){
     const formErrors = useSelector(state => state.reviewsReducer.formErrors);
     const idToken = useSelector(state => state.userReducer.idToken);
     const [updatedReview, setUpdatedReview] = useState(review);
-    
+
     useEffect(() => {
-        setUpdatedReview(review); // Makes sure the review contents prepopulates with the correct values
-        dispatch(reviewsActions.setFormErrors({})); // Clear errors when review changes
+        setUpdatedReview(review);
+        dispatch(reviewsActions.setFormErrors({}));
     }, [review, dispatch]);
+
+    if (!modal) return null;
 
     const validateForm = () => {
         const newErrors = validateReview(updatedReview);
@@ -38,76 +38,75 @@ export default function EditReviewModal({ modal, signIn, save, review }){
         }
     };
 
-    const handleInputChange = (e) => { 
-        const { name, value } = e.target; 
-        setUpdatedReview(prevReview => ({ ...prevReview, [name]: value, }));
-        
-        // Clear errors when user types in form fields.
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setUpdatedReview(prevReview => ({ ...prevReview, [name]: value }));
         if (formErrors[name]) {
             dispatch(reviewsActions.deleteFormError(name));
         }
     };
 
     return (
-        <>
-            <Modal isOpen={modal} toggle={save} > 
-                <ModalHeader toggle={save}>Let's edit your review</ModalHeader>
-                <ModalBody>
-                    {signIn? (
-                    <>
-                        <FormGroup>
-                            <Label for="nameInput">Title</Label>
-                            <Input
-                                type="text"
-                                name="title"
-                                value={updatedReview.title || ''} 
-                                onChange={handleInputChange} 
-                                placeholder="Enter new title"
-                                invalid={!!formErrors.title}
-                            />
-                            {formErrors.title && <p className="text-danger">{formErrors.title}</p>}
-                        </FormGroup>
-                        <ScoreDropdown 
-                            labelName="Score" 
-                            name="score" 
-                            id="scoreInput" 
-                            value={updatedReview.score || ''} 
-                            onChange={handleInputChange}
-                        />
-                        {formErrors.score && <p className="text-danger">{formErrors.score}</p>}
-                        <FormGroup>
-                            <Label for="bodyInput">Body</Label>
-                            <Input
-                                name="body"
-                                placeholder="Your review text here"
-                                type="textarea"
-                                value={updatedReview.body || ''} 
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+            <div className="w-full max-w-lg rounded-lg bg-white p-4 shadow-xl">
+                <div className="mb-3 flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Let&apos;s edit your review</h3>
+                    <button className="text-slate-600" onClick={save}>X</button>
+                </div>
+                <div>
+                    {signIn ? (
+                        <>
+                            <div className="mb-3">
+                                <label htmlFor="titleInput" className="mb-1 block text-sm font-medium text-slate-700">Title</label>
+                                <input
+                                    id="titleInput"
+                                    className={`w-full rounded-md border px-3 py-2 ${formErrors.title ? "border-red-500" : "border-slate-300"}`}
+                                    type="text"
+                                    name="title"
+                                    value={updatedReview.title || ''}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter new title"
+                                />
+                                {formErrors.title && <p className="text-red-600">{formErrors.title}</p>}
+                            </div>
+                            <ScoreDropdown
+                                labelName="Score"
+                                name="score"
+                                id="scoreInput"
+                                value={updatedReview.score || ''}
                                 onChange={handleInputChange}
-                                invalid={!!formErrors.body}
                             />
-                            {formErrors.body && <p className="text-danger">{formErrors.body}</p>}
-                        </FormGroup>
-                    </>
-                    ):(
+                            {formErrors.score && <p className="text-red-600">{formErrors.score}</p>}
+                            <div className="mb-3">
+                                <label htmlFor="bodyInput" className="mb-1 block text-sm font-medium text-slate-700">Body</label>
+                                <textarea
+                                    id="bodyInput"
+                                    className={`w-full rounded-md border px-3 py-2 ${formErrors.body ? "border-red-500" : "border-slate-300"}`}
+                                    name="body"
+                                    placeholder="Your review text here"
+                                    value={updatedReview.body || ''}
+                                    onChange={handleInputChange}
+                                />
+                                {formErrors.body && <p className="text-red-600">{formErrors.body}</p>}
+                            </div>
+                        </>
+                    ) : (
                         <div>
                             <img src={FryposalLoginImage} className="fryposal-login-image" alt="fyposal-login-image"/>
                             <br></br>
                             <h4 className="login-requirement-message">"Will you log in for me?"</h4>
                         </div>
                     )}
-                </ModalBody>
-                    {signIn && (<ModalFooter>
-                        <Button color="primary" onClick={handleSaveClick}>
-                            Save Edit
-                        </Button> {'  '}
-                        <Button color="secondary" onClick={save}>
-                            Cancel Edit
-                        </Button>
-                    </ModalFooter>
+                </div>
+                {signIn && (
+                    <div className="mt-4">
+                        <Button color="primary" onClick={handleSaveClick}>Save Edit</Button>
+                        <Button color="secondary" onClick={save}>Cancel Edit</Button>
+                    </div>
                 )}
-            </Modal> 
-        </>
-    )
+            </div>
+        </div>
+    );
 }
 
 EditReviewModal.propTypes = propTypes;

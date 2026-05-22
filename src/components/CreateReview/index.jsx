@@ -26,7 +26,7 @@ const CreateReview = ({ params: { restaurantId }, error, currentRestaurants, cur
     }
 
     return (
-        <div>
+        <section className="w-full max-w-4xl rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm sm:p-6">
             <Banner type="error" message={error} />
             <Breadcrumb aliases = {{[currentRestaurant.id]: currentRestaurant.displayName.text}} />
             <RestaurantHeader currentRestaurant = {currentRestaurant} />
@@ -42,7 +42,7 @@ const CreateReview = ({ params: { restaurantId }, error, currentRestaurants, cur
                 deleteFormError = {deleteFormError}
                 idToken = {idToken}
             />
-        </div>
+        </section>
     )
 }
 

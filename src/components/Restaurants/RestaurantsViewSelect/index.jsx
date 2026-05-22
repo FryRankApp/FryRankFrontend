@@ -1,5 +1,5 @@
 import { PropTypes } from 'prop-types';
-import { Button, ButtonGroup } from 'reactstrap';
+import { Button } from '../../Common';
 import { SELECTED_VIEW } from '../../../constants';
 
 const propTypes = {
@@ -10,24 +10,20 @@ const propTypes = {
 const RestaurantsViewSelect = ({ selectedView, setSelectedView }) => {
     return (
         <div>
-            <ButtonGroup className="my-2">
+            <div className="my-2 inline-flex rounded-md border border-slate-300 p-1">
                 <Button
-                    color="secondary"
-                    outline
+                    color={selectedView === SELECTED_VIEW.MAP ? "primary" : "secondary"}
                     onClick={() => setSelectedView(SELECTED_VIEW.MAP)}
-                    active={selectedView === SELECTED_VIEW.MAP}
                 >
                     Map
                 </Button>
                 <Button
-                    color="secondary"
-                    outline
+                    color={selectedView === SELECTED_VIEW.LIST ? "primary" : "secondary"}
                     onClick={() => setSelectedView(SELECTED_VIEW.LIST)}
-                    active={selectedView === SELECTED_VIEW.LIST}
                 >
                     List
                 </Button>
-            </ButtonGroup>
+            </div>
         </div>
     );
 }
