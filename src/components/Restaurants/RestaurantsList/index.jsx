@@ -21,9 +21,19 @@ const RestaurantsList = ({ restaurantIds, currentRestaurants, aggregateReviewsDa
             return (
                 <Fragment key = {i}>
                     <article className="rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:border-red-300 hover:bg-white">
-                    <p className="inline-paragraph text-lg font-bold"><Link to={restaurantLink}>{restaurant.displayName.text}</Link></p>
-                    {aggregateReviewsData[restaurant.id] && <Score size="sm" score={aggregateReviewsData[restaurant.id].avgScore} />}
-                    <p className="mt-1 text-sm text-slate-600">{restaurant.formattedAddress}</p>
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                                <p className="inline-paragraph text-lg font-bold leading-tight">
+                                    <Link to={restaurantLink}>{restaurant.displayName.text}</Link>
+                                </p>
+                                <p className="mt-1 text-sm text-slate-600">{restaurant.formattedAddress}</p>
+                            </div>
+                            {aggregateReviewsData[restaurant.id] && (
+                                <div className="shrink-0">
+                                    <Score size="sm" score={aggregateReviewsData[restaurant.id].avgScore} />
+                                </div>
+                            )}
+                        </div>
                     </article>
                 </Fragment>
             )})}</div>;
