@@ -20,6 +20,11 @@ export const validateReview = (review) => {
     if (!review.body || review.body.trim() === "") {
         errors.body = 'Please enter a few words about your experience.';
     }
-    
+
+    // At least one tag must be selected.
+    if (!Array.isArray(review.tags) || review.tags.length === 0) {
+        errors.tags = 'Please select at least one fry type.';
+    }
+
     return errors;
 };

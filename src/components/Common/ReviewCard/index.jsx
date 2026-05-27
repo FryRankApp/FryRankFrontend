@@ -1,6 +1,6 @@
 import { PropTypes } from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Score } from '../';
+import { Score, TagBadges } from '../';
 import { useSelector } from 'react-redux';
 import {
     PATH_ACCOUNT_REVIEWS,
@@ -65,6 +65,7 @@ const ReviewCard = ({ review, restaurant }) => {
                     <p className="text-slate-800">
                         {review.body}
                     </p>
+                    <TagBadges tags={updatedReview?.tags || review.tags} className="mt-2" />
                     {review.isoDateTime &&
                         <h6 className="mb-2 italic text-slate-500">
                             {new Date(review.isoDateTime).toLocaleString()}

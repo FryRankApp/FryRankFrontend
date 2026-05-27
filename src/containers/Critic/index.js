@@ -18,6 +18,7 @@ const mapStateToProps = (state) => {
         restaurantsError: state.restaurantsReducer.restaurantsError,
         username: getUsernameFromState(state),
         otherUserSettings: state.userSettingsReducer.otherUserSettings,
+        selectedTag: state.reviewsReducer.tagFilter,
     }
 }
 
@@ -27,6 +28,7 @@ const mapDispatchToProps = {
     getRestaurantsForIds: restaurantsActions.startGetRestaurantsForIdsRequest,
     getOtherUserSettings: userSettingsActions.startGetOtherUserSettingsRequest,
     resetOtherUserSettings: userSettingsActions.resetOtherUserSettings,
+    onTagChange: reviewsActions.setTagFilter,
 };
 
 export default compose(
@@ -34,20 +36,25 @@ export default compose(
     connect(mapStateToProps, mapDispatchToProps),
     lifecycle({
         componentDidMount() {
-            const { params: { accountId }, getReviews, resetReviews, getOtherUserSettings, resetOtherUserSettings } = this.props;
+            const { params: { accountId }, getReviews, resetReviews, getOtherUserSettings, resetOtherUserSettings, onTagChange } = this.props;
             resetReviews();
+            onTagChange(null);
             getReviews(accountId);
             resetOtherUserSettings();
             getOtherUserSettings(accountId);
         },
         componentDidUpdate(prevProps) {
-            const { currentRestaurants, getRestaurantsForIds, reviews, params: { accountId }, getReviews, resetOtherUserSettings, getOtherUserSettings } = this.props;
+            const { currentRestaurants, getRestaurantsForIds, reviews, params: { accountId }, getReviews, resetOtherUserSettings, getOtherUserSettings, resetReviews, selectedTag } = this.props;
             // The following code logic may run every time the state changes
 
             if (accountId !== prevProps.params.accountId) {
-                getReviews(accountId);
+                resetReviews();
+                getReviews(accountId, null, selectedTag);
                 resetOtherUserSettings();
                 getOtherUserSettings(accountId);
+            } else if (prevProps.selectedTag !== selectedTag) {
+                resetReviews();
+                getReviews(accountId, null, selectedTag);
             }
 
             if (reviews) {

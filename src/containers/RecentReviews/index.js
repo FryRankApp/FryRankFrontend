@@ -3,8 +3,11 @@ import { GOOGLE_API_PATH, HEADER_CONTENT_TYPE, HEADER_API_KEY, HEADER_FIELD_MASK
 
 export const reviewCount = 10;
 
-export const fetchRecentReviews = async (count = reviewCount) => {
-    const response = await fetch(`${BACKEND_SERVICE_PATH}/reviews/recent?count=${count}`);
+export const fetchRecentReviews = async (count = reviewCount, tag = null) => {
+    const url = new URL(`${BACKEND_SERVICE_PATH}/reviews/recent`);
+    url.searchParams.set('count', count);
+    if (tag) url.searchParams.set('tag', tag);
+    const response = await fetch(url.toString());
     const newData = await response.json();
     return newData.reviews;
 };

@@ -24,3 +24,25 @@ export const SELECTED_VIEW = Object.freeze({
     MAP: Symbol('map'),
     LIST: Symbol('list'),
 });
+
+// Canonical list of fry style tags. These string values are sent to the backend
+// as-is, so any change here must be coordinated with the FryRankLambda backend.
+export const FRY_TAGS = Object.freeze([
+    "Regular",
+    "Crinkle",
+    "Curly",
+    "Waffle",
+    "Shoestring",
+    "Steak",
+    "Wedge",
+    "Tornado",
+    "Tater Tots",
+    "Sweet Potato",
+    "Truffle",
+    "Garlic",
+    "Cheese",
+    "Chili Cheese",
+    "Cajun",
+    "Poutine",
+    "Loaded",
+]);
