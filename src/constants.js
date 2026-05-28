@@ -28,7 +28,6 @@ export const SELECTED_VIEW = Object.freeze({
 // Canonical list of fry style tags. These string values are sent to the backend
 // as-is, so any change here must be coordinated with the FryRankLambda backend.
 export const FRY_TAGS = Object.freeze([
-    "Regular",
     "Crinkle",
     "Curly",
     "Waffle",
