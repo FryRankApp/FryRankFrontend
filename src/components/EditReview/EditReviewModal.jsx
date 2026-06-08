@@ -91,12 +91,7 @@ export default function EditReviewModal({ modal, signIn, save, review }){
                             </div>
                             <TagSelector
                                 selectedTags={updatedReview.tags || []}
-                                onChange={(nextTags) => {
-                                    setUpdatedReview(prev => ({ ...prev, tags: nextTags }));
-                                    if (formErrors.tags) {
-                                        dispatch(reviewsActions.deleteFormError('tags'));
-                                    }
-                                }}
+                                onChange={(nextTags) => handleInputChange({ target: { name: 'tags', value: nextTags } })}
                                 error={formErrors.tags}
                             />
                         </>
