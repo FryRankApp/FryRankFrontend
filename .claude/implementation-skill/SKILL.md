@@ -20,6 +20,7 @@ Before writing code, confirm that `feedback_fryrank_implementation_guidelines.md
 - Adding the same UI to multiple pages? Build one shared component and use it everywhere. Don't inline near-identical copies.
 - Adding the same logic to multiple places (reducers, sagas, containers)? Apply the pattern symmetrically — don't let parallel paths drift.
 - **Test before extracting:** if you've written it once and would write it again, *that's* when you extract. A few similar lines is better than a half-fitting shared helper that needs `if/else` for each caller.
+- **Watch for duplication a signature mismatch is hiding.** A custom component's callback usually emits a bare value (`onChange(nextValue)`), while a form's handler takes a DOM event (`e.target.name` / `e.target.value`). That difference disguises the fact that an inline callback re-implements the same update-and-clear-error body the handler already has. Don't compare *signatures* — compare *what the bodies do*. When they match, bridge the shapes instead of copying the body, e.g. route the value-callback through the existing handler with a synthetic event: `onChange={(v) => handleInputChange({ target: { name: 'tags', value: v } })}`. This applies within a single file (generic handler vs. specialized inline callback), not just across files.
 
 ### 2. No pass-through methods or silent refactors
 - A wrapper that just forwards args to another function with no added logic is an anti-pattern. If you find yourself writing one to "make room" for a new feature, stop.
@@ -104,7 +105,7 @@ These are the conventions to follow when *writing new code*. They don't describe
 ## Quick self-check before each commit
 
 - [ ] No pass-through methods or silent refactors? If a refactor seemed needed, did I ask first?
-- [ ] No duplicated logic across files? If yes, is the duplication justified (only a few instances, or each has meaningful differences)?
+- [ ] No duplicated logic across files — or *within* a file between a generic event handler and an inline value-emitting component callback (compare what the bodies do, not their signatures)? If duplication remains, is it justified (only a few instances, or each has meaningful differences)?
 - [ ] Validation enforced at submission time on the frontend, with errors surfaced through the reducer's form-errors slot?
 - [ ] Tests scoped to new logic, not re-testing existing coverage?
 - [ ] Prop names readable without reading the implementation?
