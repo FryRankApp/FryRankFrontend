@@ -1,5 +1,5 @@
 import { PropTypes } from 'prop-types';
-import { Banner, FrySpinner, ReviewCardList } from '../Common';
+import { Banner, FrySpinner, ReviewCardList, TagFilter } from '../Common';
 
 const propTypes = {
     reviews: PropTypes.array.isRequired,
@@ -10,14 +10,18 @@ const propTypes = {
     requestingReviews: PropTypes.bool.isRequired,
     restaurantsError: PropTypes.bool.isRequired,
     getReviews: PropTypes.func.isRequired,
+    selectedTag: PropTypes.string,
+    onTagChange: PropTypes.func.isRequired,
 };
 
-const Critic = ({ params: { accountId }, reviews, nextCursor, reviewsError, currentRestaurants, requestingReviews, restaurantsError, otherUserSettings, getReviews }) => {
+const Critic = ({ params: { accountId }, reviews, nextCursor, reviewsError, currentRestaurants, requestingReviews, restaurantsError, otherUserSettings, getReviews, selectedTag, onTagChange }) => {
     const reviewsBody = () => {
         if (!reviews) {
             return <FrySpinner />;
         } else if (reviews.length === 0) {
-            return <p>Sorry, this critic has not yet published a review.</p>
+            return <p>{selectedTag
+                ? `This critic has no reviews with the "${selectedTag}" tag yet.`
+                : "Sorry, this critic has not yet published a review."}</p>
         } else {
             return (
                 <ReviewCardList
@@ -25,7 +29,7 @@ const Critic = ({ params: { accountId }, reviews, nextCursor, reviewsError, curr
                     currentRestaurants={currentRestaurants}
                     nextCursor={nextCursor}
                     requestingReviews={requestingReviews}
-                    onLoadMore={() => getReviews(accountId, nextCursor)}
+                    onLoadMore={() => getReviews(accountId, nextCursor, selectedTag)}
                 />
             )
         }
@@ -38,6 +42,7 @@ const Critic = ({ params: { accountId }, reviews, nextCursor, reviewsError, curr
             <Banner type="error" message = {reviewsError} />
             <Banner type="error" message = {restaurantsError} />
             { !requestingReviews && reviews && <h1 className="mb-3 text-3xl font-bold text-slate-900">{criticName}'s Reviews</h1> }
+            <TagFilter value={selectedTag} onChange={onTagChange} />
             {reviewsBody()}
         </section>
     )

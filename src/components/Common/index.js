@@ -10,4 +10,7 @@ export { default as ReviewCard } from './ReviewCard';
 export { default as ReviewCardList } from './ReviewCardList';
 export { default as Score } from "./Score";
 export { default as ScoreDropdown } from "./ScoreDropdown";
+export { default as TagBadges } from "./TagBadges";
+export { default as TagFilter } from "./TagFilter";
+export { default as TagSelector } from "./TagSelector";
 export { validateReview } from '../../helpers/reviewValidation';
