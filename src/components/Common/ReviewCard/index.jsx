@@ -1,7 +1,7 @@
 import { PropTypes } from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Score, TagBadges } from '../';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import {
     PATH_ACCOUNT_REVIEWS,
     PATH_RESTAURANT_REVIEWS,
@@ -9,9 +9,10 @@ import {
     PATH_VARIABLE_RESTAURANT_ID
 } from '../../../constants.js'
 import '../style.css'
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaThumbsUp, FaThumbsDown, FaHeart } from "react-icons/fa";
 import EditReviewModal from '../../EditReview/EditReviewModal.jsx';
-import DeleteReviewModal from '../../DeleteReview/DeleteReviewModal.jsx'
+import DeleteReviewModal from '../../DeleteReview/DeleteReviewModal.jsx';
+import { reviewsActions } from '../../../redux/reducers/reviews';
 import { useState, useCallback, useMemo } from 'react';
 
 const propTypes = {
@@ -20,12 +21,18 @@ const propTypes = {
 };
 
 const ReviewCard = ({ review, restaurant }) => {
+    const dispatch = useDispatch();
     const userAccountId = useSelector((state)=>state.userReducer.userData?.sub);
+    const loggedIn = useSelector((state) => state.userReducer.loggedIn);
     const updatedReview = useSelector((state) => state.reviewsReducer.reviews?.find(r => r.reviewId === review.reviewId && r.accountId === review.accountId));
     const isReviewAuthor = useMemo(() => userAccountId === review.accountId, [userAccountId, review.accountId]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    
+    const idToken = useSelector((state) => state.userReducer.idToken);
+    const displayReview = updatedReview ?? review;
+    const reactionCounts = displayReview?.reactionCounts || {};
+    const myReactions = displayReview?.myReactions || {};
+
     const editSave = useCallback(()=>{
         setIsEditModalOpen((prev)=>!prev);
     },[])
@@ -33,6 +40,26 @@ const ReviewCard = ({ review, restaurant }) => {
     const deleteReview = useCallback(()=>{
         setIsDeleteModalOpen((prev)=>!prev);
     },[])
+
+    const onToggleReaction = useCallback((reactionType) => {
+        if (!loggedIn || !idToken) {
+            return;
+        }
+        const currentlyOn = !!myReactions?.[
+            reactionType === "THUMBS_UP"
+                ? "thumbsUp"
+                : reactionType === "THUMBS_DOWN"
+                    ? "thumbsDown"
+                    : "heart"
+        ];
+        dispatch(reviewsActions.startLikeReviewRequest(
+            displayReview.reviewId,
+            displayReview.accountId,
+            reactionType,
+            !currentlyOn,
+            idToken
+        ));
+    }, [dispatch, loggedIn, idToken, myReactions, displayReview]);
 
     return (
         <>
@@ -42,8 +69,9 @@ const ReviewCard = ({ review, restaurant }) => {
                         {updatedReview?.title || review.title}
                         </h3>
                         <Score size="md" score={review.score} />
-                        {isReviewAuthor && ( <FaEdit style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '50px', cursor: 'pointer' }} onClick={editSave} /> )}  
-                        {isReviewAuthor && ( <FaTrash style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '15px', cursor: 'pointer' }} onClick={deleteReview} /> )}                      
+                        {isReviewAuthor && ( <FaEdit style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '50px', cursor: 'pointer' }} onClick={editSave} /> )}
+                        {isReviewAuthor && ( <FaTrash style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '15px', cursor: 'pointer' }} onClick={deleteReview} /> )}
+
                     </div>
                     { restaurant &&
                         <div>
@@ -65,6 +93,38 @@ const ReviewCard = ({ review, restaurant }) => {
                     <p className="text-slate-800">
                         {review.body}
                     </p>
+                    <div className="mb-2 flex items-center gap-3">
+                        <button
+                            type="button"
+                            className="flex items-center gap-1 border-0 bg-transparent p-0 disabled:cursor-not-allowed disabled:opacity-50"
+                            onClick={() => onToggleReaction("THUMBS_UP")}
+                            disabled={!loggedIn}
+                            title={loggedIn ? "Toggle thumbs up" : "Sign in to react"}
+                        >
+                            <FaThumbsUp color={myReactions.thumbsUp ? "#0d6efd" : "#6c757d"} />
+                            <span>{reactionCounts.thumbsUp ?? 0}</span>
+                        </button>
+                        <button
+                            type="button"
+                            className="flex items-center gap-1 border-0 bg-transparent p-0 disabled:cursor-not-allowed disabled:opacity-50"
+                            onClick={() => onToggleReaction("THUMBS_DOWN")}
+                            disabled={!loggedIn}
+                            title={loggedIn ? "Toggle thumbs down" : "Sign in to react"}
+                        >
+                            <FaThumbsDown color={myReactions.thumbsDown ? "#dc3545" : "#6c757d"} />
+                            <span>{reactionCounts.thumbsDown ?? 0}</span>
+                        </button>
+                        <button
+                            type="button"
+                            className="flex items-center gap-1 border-0 bg-transparent p-0 disabled:cursor-not-allowed disabled:opacity-50"
+                            onClick={() => onToggleReaction("HEART")}
+                            disabled={!loggedIn}
+                            title={loggedIn ? "Toggle heart" : "Sign in to react"}
+                        >
+                            <FaHeart color={myReactions.heart ? "#dc3545" : "#6c757d"} />
+                            <span>{reactionCounts.heart ?? 0}</span>
+                        </button>
+                    </div>
                     <TagBadges tags={updatedReview?.tags || review.tags} className="mt-2" />
                     {review.isoDateTime &&
                         <h6 className="mb-2 italic text-slate-500">
@@ -72,18 +132,18 @@ const ReviewCard = ({ review, restaurant }) => {
                         </h6>
                     }
             </div>
-            <EditReviewModal 
-                review={review} 
-                save={editSave} 
+            <EditReviewModal
+                review={review}
+                save={editSave}
                 modal={isEditModalOpen}
                 signIn={userAccountId}
-            /> 
+            />
             <DeleteReviewModal
-                reviewId={review.reviewId} 
-                option={deleteReview} 
+                reviewId={review.reviewId}
+                option={deleteReview}
                 modal={isDeleteModalOpen}
                 signIn={userAccountId}
-            /> 
+            />
         </>
     )
 }
