@@ -28,6 +28,7 @@ const ReviewCardList = ({ reviews, currentRestaurants, nextCursor, requestingRev
 
     const sorted = reviews?.map(review => (
         <ReviewCard
+            key={`${review.reviewId}-${review.accountId || review.authorId || "anon"}`}
             review={review}
             restaurant={currentRestaurants ? currentRestaurants.get(review.restaurantId) : null}
         />
@@ -45,7 +46,7 @@ const ReviewCardList = ({ reviews, currentRestaurants, nextCursor, requestingRev
             {requestingReviews && <FrySpinner />}
             {onLoadMore && (nextCursor
                 ? <div ref={sentinelRef} style={{ height: '1px' }} />
-                : <p style={{ textAlign: 'center', fontSize: '1.1rem', fontWeight: 'bold' }}>End of reviews.</p>
+                : <p className="py-4 text-center text-base font-semibold text-slate-600">End of reviews.</p>
             )}
         </>
     );

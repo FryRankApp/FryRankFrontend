@@ -1,5 +1,4 @@
 import {PropTypes} from "prop-types";
-import {Form, FormGroup, Input, Label} from 'reactstrap'
 import {Button, Banner} from "../Common";
 
 const propTypes = {
@@ -32,16 +31,16 @@ const UserSettings = ({ userSettings, currentUserSettings, loggedIn, setUserSett
                     <Banner type="error" message={error} />
                     <Banner type="success" message={successfulSetUserSettings} />
                     <h2>Settings</h2>
-                    <Form
+                    <form
                         onChange={(event) => {
                             updateCurrentUserSettings(event.target.name, event.target.value)
                         }}
                     >
-                        <FormGroup>
-                            <Label>Username</Label>
-                            <Input name="username" defaultValue={userSettings.username}></Input>
-                        </FormGroup>
-                    </Form>
+                        <div className="mb-3">
+                            <label className="mb-1 block text-sm font-medium text-slate-700">Username</label>
+                            <input className="w-full rounded-md border border-slate-300 px-3 py-2" name="username" defaultValue={userSettings.username}></input>
+                        </div>
+                    </form>
                     <Button children='Update'
                             color='danger'
                             onClick={(event) => {
@@ -53,5 +52,7 @@ const UserSettings = ({ userSettings, currentUserSettings, loggedIn, setUserSett
         </div>
     )
 }
+
+UserSettings.propTypes = propTypes;
 
 export default UserSettings;

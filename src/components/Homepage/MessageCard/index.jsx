@@ -1,4 +1,3 @@
-import { Card, CardBody } from 'reactstrap';
 import { PropTypes } from 'prop-types';
 import { FrySpinner } from '../../Common';
 
@@ -9,15 +8,9 @@ const propTypes = {
 const MessageCard = ({ message }) => {
     return (
         message && message.length > 0 ?
-            <Card
-                color="warning"
-                className="text-box inline my-2"
-                style={{width: "100%"}}
-            >
-                <CardBody>
+            <div className="my-2 inline w-full max-w-[80%] rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 shadow-sm">
                     {message}
-                </CardBody>
-            </Card> : <FrySpinner className="spinner" />
+            </div> : <FrySpinner className="spinner" />
     )
 }
 

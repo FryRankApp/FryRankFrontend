@@ -9,9 +9,8 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@vis.gl/react-google-maps": "^1.2.0",
-    "axios": "^1.13.5",
-    "bootstrap": "5.1",
-    "lodash": "^4.17.23",
+    "axios": "^1.15.2",
+    "lodash": "^4.18.1",
     "react": "^18.2.0",
     "react-cookie": "^7.2.1",
     "react-dom": "^18.2.0",
@@ -20,7 +19,6 @@
     "react-redux": "^8.1.1",
     "react-router-dom": "^6.30.3",
     "react-scripts": "^5.0.1",
-    "reactstrap": "^8.10.1",
     "redux-saga": "^1.2.3",
     "serve": "^14.2.5",
     "web-vitals": "^2.1.4"
@@ -50,5 +48,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^3.4.17"
   }
 }

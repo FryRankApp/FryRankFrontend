@@ -4,7 +4,7 @@ import { Button } from '../';
 
 const LinkButton = ({ link, children, color, onClick }) => {
     return (
-        <Link to={link}>
+        <Link to={link} className="inline-block">
             <Button
                 children={children}
                 color={color}

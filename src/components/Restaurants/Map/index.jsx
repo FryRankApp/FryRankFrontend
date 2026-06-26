@@ -8,8 +8,7 @@ import {
   useMap
 } from '@vis.gl/react-google-maps';
 import { Link } from 'react-router-dom';
-import { Button } from 'reactstrap';
-import { FrySpinner, Score } from '../../Common';
+import { Button, FrySpinner, Score } from '../../Common';
 import { PATH_RESTAURANT_REVIEWS, PATH_VARIABLE_RESTAURANT_ID } from '../../../constants';
 import MapPins from '../MapPins';
 import { getDistance } from './helpers';
@@ -31,10 +30,9 @@ const Map = ({ showInfoWindow, setShowInfoWindow, setInfoWindowProps, infoWindow
 
     const map = useMap();
 
-    type coords = google.maps.LatLngLiteral
-
     const adjustBounds = () => {
-        const bounds: coords = new google.maps.LatLngBounds();
+        if (!window.google) return;
+        const bounds = new window.google.maps.LatLngBounds();
         pinData.forEach(place => {
             bounds.extend({
                 lat: place.location.lat,
@@ -80,7 +78,7 @@ const Map = ({ showInfoWindow, setShowInfoWindow, setInfoWindowProps, infoWindow
                     />
                     <MapControl position={ControlPosition.TOP_CENTER}>
                         { showMapSearchButton &&
-                            <Button className="my-2" onClick={() => {
+                            <Button className="my-2 bg-white text-slate-800 hover:bg-slate-100" onClick={() => {
                                 getRestaurantsForMapView();
                                 setShowMapSearchButton(false);
                             }}>

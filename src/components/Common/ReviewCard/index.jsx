@@ -1,7 +1,6 @@
 import { PropTypes } from 'prop-types';
-import { Card, CardBody, CardSubtitle, CardText, CardTitle } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import { Score } from '../';
+import { Score, TagBadges } from '../';
 import { useSelector, useDispatch } from 'react-redux';
 import {
     PATH_ACCOUNT_REVIEWS,
@@ -33,7 +32,7 @@ const ReviewCard = ({ review, restaurant }) => {
     const displayReview = updatedReview ?? review;
     const reactionCounts = displayReview?.reactionCounts || {};
     const myReactions = displayReview?.myReactions || {};
-  
+
     const editSave = useCallback(()=>{
         setIsEditModalOpen((prev)=>!prev);
     },[])
@@ -64,54 +63,40 @@ const ReviewCard = ({ review, restaurant }) => {
 
     return (
         <>
-            <Card
-                color="warning"
-                className="mb-2"
-                style={{
-                    maxWidth: "36rem",
-                    width: "90vw"
-                }}
-            >
-                <CardBody>
+            <div className="relative mb-3 w-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <div>
-                        <CardTitle tag="h3" style={{ display: "inline-block" }}>
+                        <h3 className="inline-block text-xl font-semibold">
                         {updatedReview?.title || review.title}
-                        </CardTitle>
+                        </h3>
                         <Score size="md" score={review.score} />
-                        {isReviewAuthor && ( <FaEdit style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '50px', cursor: 'pointer' }} onClick={editSave} /> )}  
-                        {isReviewAuthor && ( <FaTrash style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '15px', cursor: 'pointer' }} onClick={deleteReview} /> )}  
-                                     
+                        {isReviewAuthor && ( <FaEdit style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '50px', cursor: 'pointer' }} onClick={editSave} /> )}
+                        {isReviewAuthor && ( <FaTrash style={{ fontSize: '24px', position: 'absolute', top: '19px', right: '15px', cursor: 'pointer' }} onClick={deleteReview} /> )}
+
                     </div>
                     { restaurant &&
                         <div>
-                            <CardSubtitle
-                                className="inline mb-2 me-2 text-danger"
-                                tag="h5"
-                            >
+                            <h5 className="mb-2 mr-2 inline text-lg text-slate-900">
                                 <Link to={`${PATH_RESTAURANT_REVIEWS}`.replace(PATH_VARIABLE_RESTAURANT_ID, restaurant.id)}>{restaurant.displayName.text}</Link>
-                            </CardSubtitle>
-                            <CardText className="inline mb-2">
+                            </h5>
+                            <p className="mb-2 inline text-slate-600">
                                 {restaurant.formattedAddress}
-                            </CardText>
+                            </p>
                         </div>
                     }
-                    <CardSubtitle
-                        className="mb-2 text-muted"
-                        tag="h6"
-                    >
+                    <h6 className="mb-3 text-sm text-slate-500">
                         By: { review.accountId
                             ? <Link to={`${PATH_ACCOUNT_REVIEWS}`.replace(PATH_VARIABLE_ACCOUNT_ID, review.accountId)}>
                                 {review.userMetadata ? review.userMetadata.username : (review.authorId ? review.authorId : review.accountId)}
                             </Link>
                             : <div className="inline">{review.authorId}</div> }
-                    </CardSubtitle>
-                    <CardText>
+                    </h6>
+                    <p className="text-slate-800">
                         {review.body}
-                    </CardText>
-                    <div className="d-flex gap-3 align-items-center mb-2">
+                    </p>
+                    <div className="mb-2 flex items-center gap-3">
                         <button
                             type="button"
-                            className="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-1"
+                            className="flex items-center gap-1 border-0 bg-transparent p-0 disabled:cursor-not-allowed disabled:opacity-50"
                             onClick={() => onToggleReaction("THUMBS_UP")}
                             disabled={!loggedIn}
                             title={loggedIn ? "Toggle thumbs up" : "Sign in to react"}
@@ -121,7 +106,7 @@ const ReviewCard = ({ review, restaurant }) => {
                         </button>
                         <button
                             type="button"
-                            className="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-1"
+                            className="flex items-center gap-1 border-0 bg-transparent p-0 disabled:cursor-not-allowed disabled:opacity-50"
                             onClick={() => onToggleReaction("THUMBS_DOWN")}
                             disabled={!loggedIn}
                             title={loggedIn ? "Toggle thumbs down" : "Sign in to react"}
@@ -131,7 +116,7 @@ const ReviewCard = ({ review, restaurant }) => {
                         </button>
                         <button
                             type="button"
-                            className="btn btn-link p-0 text-decoration-none d-flex align-items-center gap-1"
+                            className="flex items-center gap-1 border-0 bg-transparent p-0 disabled:cursor-not-allowed disabled:opacity-50"
                             onClick={() => onToggleReaction("HEART")}
                             disabled={!loggedIn}
                             title={loggedIn ? "Toggle heart" : "Sign in to react"}
@@ -140,25 +125,25 @@ const ReviewCard = ({ review, restaurant }) => {
                             <span>{reactionCounts.heart ?? 0}</span>
                         </button>
                     </div>
+                    <TagBadges tags={updatedReview?.tags || review.tags} className="mt-2" />
                     {review.isoDateTime &&
-                        <CardSubtitle className="mb-2 text-muted" style={{fontStyle: "italic"}} tag="h6">
+                        <h6 className="mb-2 italic text-slate-500">
                             {new Date(review.isoDateTime).toLocaleString()}
-                        </CardSubtitle>
+                        </h6>
                     }
-                </CardBody>
-            </Card>
-            <EditReviewModal 
-                review={review} 
-                save={editSave} 
+            </div>
+            <EditReviewModal
+                review={review}
+                save={editSave}
                 modal={isEditModalOpen}
                 signIn={userAccountId}
-            /> 
+            />
             <DeleteReviewModal
-                reviewId={review.reviewId} 
-                option={deleteReview} 
+                reviewId={review.reviewId}
+                option={deleteReview}
                 modal={isDeleteModalOpen}
                 signIn={userAccountId}
-            /> 
+            />
         </>
     )
 }
