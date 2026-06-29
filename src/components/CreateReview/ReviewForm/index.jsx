@@ -1,6 +1,6 @@
 import { PropTypes } from 'prop-types';
 
-import { Button, LinkButton, ScoreDropdown, validateReview } from '../../Common';
+import { Button, LinkButton, ScoreDropdown, TagSelector, validateReview } from '../../Common';
 import FryposalLoginImage from "../../../Fryposal.png";
 import './style.css';
 
@@ -101,7 +101,17 @@ const ReviewForm = ({ createReview, currentRestaurant, currentReview, updateCurr
                             placeholder="Your review text here"
                         />
                     {formErrors.body && <p className="text-red-600">{formErrors.body}</p>}
-                    </div></div>                
+                    </div>
+                    <TagSelector
+                        selectedTags={currentReview.tags || []}
+                        onChange={(nextTags) => {
+                            updateCurrentReview('tags', nextTags);
+                            if (formErrors.tags) {
+                                deleteFormError('tags');
+                            }
+                        }}
+                        error={formErrors.tags}
+                    /></div>
             }
             {loggedIn ? <Button
                 children='Submit'

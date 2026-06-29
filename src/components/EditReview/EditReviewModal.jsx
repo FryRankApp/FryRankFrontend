@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { reviewsActions } from '../../redux/reducers/reviews';
 import FryposalLoginImage from "../../Fryposal.png";
 import { PropTypes } from 'prop-types';
-import { ScoreDropdown, validateReview, Button } from "../Common";
+import { ScoreDropdown, TagSelector, validateReview, Button } from "../Common";
 
 const propTypes = {
     modal: PropTypes.bool.isRequired,
@@ -89,6 +89,11 @@ export default function EditReviewModal({ modal, signIn, save, review }){
                                 />
                                 {formErrors.body && <p className="text-red-600">{formErrors.body}</p>}
                             </div>
+                            <TagSelector
+                                selectedTags={updatedReview.tags || []}
+                                onChange={(nextTags) => handleInputChange({ target: { name: 'tags', value: nextTags } })}
+                                error={formErrors.tags}
+                            />
                         </>
                     ) : (
                         <div>

@@ -16,6 +16,7 @@ const mapStateToProps = (state) => {
         requestingRestaurantDetails: state.restaurantsReducer.requestingRestaurantDetails,
         requestingReviews: state.reviewsReducer.requestingReviews,
         loggedIn: state.userReducer.loggedIn,
+        selectedTag: state.reviewsReducer.tagFilter,
     }
 }
 
@@ -23,7 +24,8 @@ const mapDispatchToProps = {
     getRestaurantsForIds: restaurantsActions.startGetRestaurantsForIdsRequest,
     getReviews: reviewsActions.startGetAllReviewsForRestaurantRequest,
     resetCurrentRestaurant: restaurantsActions.resetCurrentRestaurant,
-    resetReviews: reviewsActions.resetReviews
+    resetReviews: reviewsActions.resetReviews,
+    onTagChange: reviewsActions.setTagFilter,
 };
 
 export default compose(
@@ -31,12 +33,20 @@ export default compose(
     connect(mapStateToProps, mapDispatchToProps),
     lifecycle({
         componentDidMount() {
-            const { params: { restaurantId }, currentRestaurants, getRestaurantsForIds, getReviews, resetReviews } = this.props;
+            const { params: { restaurantId }, currentRestaurants, getRestaurantsForIds, getReviews, resetReviews, onTagChange } = this.props;
             resetReviews();
+            onTagChange(null);
             if (!currentRestaurants || !currentRestaurants.has(restaurantId)) {
                 getRestaurantsForIds([restaurantId]);
             }
             getReviews(restaurantId);
+        },
+        componentDidUpdate(prevProps) {
+            const { params: { restaurantId }, selectedTag, resetReviews, getReviews } = this.props;
+            if (prevProps.selectedTag !== selectedTag) {
+                resetReviews();
+                getReviews(restaurantId, null, selectedTag);
+            }
         },
     }),
 )(Reviews);

@@ -8,10 +8,11 @@ import { BACKEND_SERVICE_PATH, AGGREGATE_INFORMATION_API_PATH, REVIEW_PROPERTY_I
 const REVIEWS_API_PATH = `${BACKEND_SERVICE_PATH}/reviews`;
 const REVIEWS_LIMIT = 10;
 
-export function* callGetAllReviewsForRestaurant({ restaurantId, cursor }) {
+export function* callGetAllReviewsForRestaurant({ restaurantId, cursor, tag }) {
     try {
         const params = { restaurantId, limit: REVIEWS_LIMIT };
         if (cursor) params.cursor = cursor;
+        if (tag) params.tag = tag;
         const { data } = yield axios.get(REVIEWS_API_PATH, { params });
         const aggregateReviewsData = yield axios.get(AGGREGATE_INFORMATION_API_PATH, { params: { ids: restaurantId, rating: true } });
         yield put(reviewsActions.successfulGetAllReviewsForRestaurantRequest(
@@ -24,10 +25,11 @@ export function* callGetAllReviewsForRestaurant({ restaurantId, cursor }) {
     }
 }
 
-export function* callGetAllReviewsForAccount({ accountId, cursor }) {
+export function* callGetAllReviewsForAccount({ accountId, cursor, tag }) {
     try {
         const params = { accountId, limit: REVIEWS_LIMIT };
         if (cursor) params.cursor = cursor;
+        if (tag) params.tag = tag;
         const { data } = yield axios.get(REVIEWS_API_PATH, { params });
         yield put(reviewsActions.successfulGetAllReviewsForAccountRequest(
             data,

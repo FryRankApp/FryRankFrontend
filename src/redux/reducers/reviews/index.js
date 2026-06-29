@@ -18,7 +18,8 @@ export const types = {
     RESET_REVIEWS: "RESET_REVIEWS",
     SET_REVIEWS: "SET_REVIEWS",
     SET_FORM_ERROR: "SET_FORM_ERROR",
-    DELETE_FORM_ERROR: "DELETE_FORM_ERROR"
+    DELETE_FORM_ERROR: "DELETE_FORM_ERROR",
+    SET_TAG_FILTER: "SET_TAG_FILTER"
 }
 
 export const initialState = {
@@ -30,12 +31,14 @@ export const initialState = {
     "score": null,
     "title": null,
     "body": null,
+    "tags": [],
   },
   error: '',
   formErrors: {},
   successfulCreate: null,
   successfulDelete: null,
   requestingReviews: false,
+  tagFilter: null,
 };
 
 export default (state = initialState, action) => {
@@ -91,13 +94,14 @@ export default (state = initialState, action) => {
             }
         }
 
-        case types.CREATE_REVIEW_FOR_RESTAURANT_REQUEST: {           
+        case types.CREATE_REVIEW_FOR_RESTAURANT_REQUEST: {
             return {
                 ...state,
                 currentReview: {
                     // Reset the current review, except for the restaurantId, which gets set on page load
                     ...initialState.currentReview,
-                    restaurantId: state.currentReview.restaurantId
+                    restaurantId: state.currentReview.restaurantId,
+                    tags: [],
                 },
                 formErrors: initialState.formErrors
             };
@@ -202,16 +206,23 @@ export default (state = initialState, action) => {
             }
         }
 
+        case types.SET_TAG_FILTER: {
+            return {
+                ...state,
+                tagFilter: action.tag,
+            }
+        }
+
         default:
             return state;
   }
 }
 
 export const reviewsActions = {
-    startGetAllReviewsForRestaurantRequest: (restaurantId, cursor = null) => ({ type: types.GET_RESTAURANT_REVIEWS_REQUEST, restaurantId, cursor }),
+    startGetAllReviewsForRestaurantRequest: (restaurantId, cursor = null, tag = null) => ({ type: types.GET_RESTAURANT_REVIEWS_REQUEST, restaurantId, cursor, tag }),
     successfulGetAllReviewsForRestaurantRequest: (reviewsData, averageScore, nextCursor) => ({ type: types.GET_RESTAURANT_REVIEWS_SUCCESS, reviewsData, averageScore, nextCursor }),
     failedGetAllReviewsForRestaurantRequest: error => ({ type: types.GET_RESTAURANT_REVIEWS_FAILURE, error }),
-    startGetAllReviewsForAccountRequest: (accountId, cursor = null) => ({ type: types.GET_ACCOUNT_REVIEWS_REQUEST, accountId, cursor }),
+    startGetAllReviewsForAccountRequest: (accountId, cursor = null, tag = null) => ({ type: types.GET_ACCOUNT_REVIEWS_REQUEST, accountId, cursor, tag }),
     successfulGetAllReviewsForAccountRequest: (reviewsData, nextCursor) => ({ type: types.GET_ACCOUNT_REVIEWS_SUCCESS, reviewsData, nextCursor }),
     failedGetAllReviewsForAccountRequest: error => ({ type: types.GET_ACCOUNT_REVIEWS_FAILURE, error }),
     startCreateReviewForRestaurantRequest: (review, idToken) => ({ type: types.CREATE_REVIEW_FOR_RESTAURANT_REQUEST, review, idToken }),
@@ -225,5 +236,6 @@ export const reviewsActions = {
     resetReviews: () => ({ type: types.RESET_REVIEWS }),
     setReviews: (reviews) => ({ type: types.SET_REVIEWS, payload: reviews }),
     setFormErrors: (errors) => ({ type: types.SET_FORM_ERROR, errors }),
-    deleteFormError: (errorKey) => ({ type: types.DELETE_FORM_ERROR, errorKey })
+    deleteFormError: (errorKey) => ({ type: types.DELETE_FORM_ERROR, errorKey }),
+    setTagFilter: (tag) => ({ type: types.SET_TAG_FILTER, tag })
 }

@@ -1,5 +1,5 @@
 import { PropTypes } from 'prop-types';
-import { Breadcrumb, Button, Banner, FrySpinner, LinkButton, RestaurantHeader, ReviewCardList } from '../Common';
+import { Breadcrumb, Button, Banner, FrySpinner, LinkButton, RestaurantHeader, ReviewCardList, TagFilter } from '../Common';
 
 const propTypes = {
     reviews: PropTypes.array.isRequired,
@@ -12,21 +12,25 @@ const propTypes = {
     requestingReviews: PropTypes.bool.isRequired,
     loggedIn: PropTypes.bool.isRequired,
     getReviews: PropTypes.func.isRequired,
+    selectedTag: PropTypes.string,
+    onTagChange: PropTypes.func.isRequired,
 };
 
-const Reviews = ({ params: { restaurantId }, reviews, nextCursor, reviewsError, restaurantsError, currentRestaurants, requestingRestaurantDetails, requestingReviews, averageScore, loggedIn, getReviews }) => {
+const Reviews = ({ params: { restaurantId }, reviews, nextCursor, reviewsError, restaurantsError, currentRestaurants, requestingRestaurantDetails, requestingReviews, averageScore, loggedIn, getReviews, selectedTag, onTagChange }) => {
     const reviewsBody = () => {
         if (!reviews) {
             return <FrySpinner />;
         } else if (reviews.length === 0) {
-            return <p>No reviews exist for this restaurant yet. Why don't you write the first one?</p>
+            return <p>{selectedTag
+                ? `No reviews with the "${selectedTag}" tag yet for this restaurant.`
+                : "No reviews exist for this restaurant yet. Why don't you write the first one?"}</p>
         } else {
             return (
                 <ReviewCardList
                     reviews={reviews}
                     nextCursor={nextCursor}
                     requestingReviews={requestingReviews}
-                    onLoadMore={() => getReviews(restaurantId, nextCursor)}
+                    onLoadMore={() => getReviews(restaurantId, nextCursor, selectedTag)}
                 />
             )
         }
@@ -66,6 +70,7 @@ const Reviews = ({ params: { restaurantId }, reviews, nextCursor, reviewsError, 
                        color='secondary'
                    />
                    </div>
+                   <TagFilter value={selectedTag} onChange={onTagChange} />
                    {reviewsBody()}
                 </div> }
         </section>
