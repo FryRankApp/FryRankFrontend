@@ -1,9 +1,26 @@
-import { put, takeEvery } from 'redux-saga/effects'
+import { call, put, takeEvery, takeLeading } from 'redux-saga/effects'
 import axios from 'axios';
 import {BACKEND_SERVICE_PATH} from "../../../constants";
 import {types, userSettingsActions} from "../../reducers/userSettings";
 
 const API_PATH = `${BACKEND_SERVICE_PATH}/userMetadata`
+
+// Seeds user metadata on login: only PUTs the Google default username when no record exists yet.
+// The backend GET returns 200 with no username field for a missing record, so absence is
+// detected by the missing field rather than a 404.
+export function* callInitializeUserSettings({ accountId, defaultUsername, idToken }){
+    try {
+        const { data } = yield axios.get(API_PATH, { params: { accountId: accountId } });
+        if (data.username !== undefined) {
+            yield put(userSettingsActions.successfulPutUserSettingsRequest(data));
+            return;
+        }
+    } catch (err) {
+        yield put(userSettingsActions.failedPutUserSettingsRequest(err.response?.data || err.message));
+        return;
+    }
+    yield call(callPutUserSettings, { accountId, defaultUsername, idToken });
+}
 
 export function* callPutUserSettings({ accountId, defaultUsername, idToken }){
     try {
@@ -55,6 +72,9 @@ export function* callSetUserSettings({ userSettings, idToken }){
 }
 
 export default function* watchUserSettingsRequest() {
+    // takeLeading (not the usual takeEvery): login fires componentDidUpdate several times before
+    // userSettings populates, and "initialize once" should ignore the re-entrant dispatches.
+    yield takeLeading(types.INITIALIZE_USER_SETTINGS_REQUEST, callInitializeUserSettings);
     yield takeEvery(types.PUT_USER_SETTINGS_REQUEST, callPutUserSettings);
     yield takeEvery(types.SET_USER_SETTINGS_REQUEST, callSetUserSettings);
     yield takeEvery(types.GET_OTHER_USER_SETTINGS_REQUEST, callGetUserSettings);
