@@ -19,16 +19,16 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
     setUserData: userActions.setUserData,
     setIdToken: userActions.setIdToken,
-    putUserSettings: userSettingsActions.startPutUserSettingsRequest,
+    initializeUserSettings: userSettingsActions.startInitializeUserSettingsRequest,
 };
 
 export default compose(
     connect(mapStateToProps, mapDispatchToProps),
     lifecycle({
         componentDidUpdate() {
-            const { loggedIn, putUserSettings, userSettings, accountId, defaultUsername, idToken } = this.props;
+            const { loggedIn, initializeUserSettings, userSettings, accountId, defaultUsername, idToken } = this.props;
             if(loggedIn && userSettings === null) {
-                putUserSettings(accountId, defaultUsername, idToken);
+                initializeUserSettings(accountId, defaultUsername, idToken);
             }
         }
     }),

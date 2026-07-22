@@ -1,4 +1,5 @@
 export const types = {
+    INITIALIZE_USER_SETTINGS_REQUEST: "INITIALIZE_USER_SETTINGS_REQUEST",
     PUT_USER_SETTINGS_REQUEST: "PUT_USER_SETTINGS_REQUEST",
     PUT_USER_SETTINGS_SUCCESS: "PUT_USER_SETTINGS_SUCCESS",
     PUT_USER_SETTINGS_FAILURE: "PUT_USER_SETTINGS_FAILURE",
@@ -22,6 +23,12 @@ export const initialState = {
 
 export default (state = initialState, action) => {
     switch (action.type) {
+        case types.INITIALIZE_USER_SETTINGS_REQUEST: {
+            return {
+                ...state
+            };
+        }
+
         case types.PUT_USER_SETTINGS_REQUEST: {
             return {
                 ...state
@@ -110,6 +117,7 @@ export default (state = initialState, action) => {
 }
 
 export const userSettingsActions = {
+    startInitializeUserSettingsRequest: (accountId, defaultUsername, idToken) => ({ type: types.INITIALIZE_USER_SETTINGS_REQUEST, accountId, defaultUsername, idToken }),
     startPutUserSettingsRequest: (accountId, defaultUsername, idToken) => ({ type: types.PUT_USER_SETTINGS_REQUEST, accountId, defaultUsername, idToken }),
     successfulPutUserSettingsRequest: data => ({ type: types.PUT_USER_SETTINGS_SUCCESS, data }),
     failedPutUserSettingsRequest: error => ({ type: types.PUT_USER_SETTINGS_FAILURE, error }),
