@@ -45,11 +45,14 @@ describe('callInitializeUserSettings', () => {
     });
 
     test('dispatches failure and skips the PUT when the GET fails', async () => {
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
         axios.get.mockRejectedValue({ response: { data: 'Internal Server Error: boom' }, message: 'Request failed with status code 500' });
 
         const dispatched = await runInitializeSaga();
 
-        expect(dispatched).toEqual([{ type: types.PUT_USER_SETTINGS_FAILURE, error: 'Internal Server Error: boom' }]);
+        expect(dispatched).toEqual([{ type: types.PUT_USER_SETTINGS_FAILURE, error: 'ERROR: Could not retrieve username.' }]);
         expect(axios.put).not.toHaveBeenCalled();
+
+        consoleErrorSpy.mockRestore();
     });
 });

@@ -16,9 +16,11 @@ export function* callInitializeUserSettings({ accountId, defaultUsername, idToke
             return;
         }
     } catch (err) {
-        yield put(userSettingsActions.failedPutUserSettingsRequest(err.response?.data || err.message));
+        console.error('Failed to retrieve user settings:', err);
+        yield put(userSettingsActions.failedPutUserSettingsRequest("ERROR: Could not retrieve username."));
         return;
     }
+    // PUT the Google default username if no record exists yet.
     yield call(callPutUserSettings, { accountId, defaultUsername, idToken });
 }
 
