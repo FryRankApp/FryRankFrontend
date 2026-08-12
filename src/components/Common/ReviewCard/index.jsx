@@ -56,7 +56,7 @@ const ReviewCard = ({ review, restaurant }) => {
             return;
         }
         const currentlyOn = !!myReactions?.[reactionKey];
-        dispatch(reviewsActions.startLikeReviewRequest(
+        dispatch(reviewsActions.startToggleReactionRequest(
             displayReview.reviewId,
             displayReview.accountId,
             reactionType,

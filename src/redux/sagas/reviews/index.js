@@ -115,5 +115,5 @@ export default function* watchReviewsRequest() {
     yield takeEvery(types.GET_ACCOUNT_REVIEWS_REQUEST, callGetAllReviewsForAccount);
     yield takeEvery(types.CREATE_REVIEW_FOR_RESTAURANT_REQUEST, callCreateReviewForRestaurant);
     yield takeEvery(types.DELETE_REVIEW_FOR_RESTAURANT_REQUEST, callDeleteReviewForRestaurantRequest);
-    yield takeEvery(types.LIKE_REVIEW_REQUEST, callToggleReaction);
+    yield takeEvery(types.TOGGLE_REACTION_REQUEST, callToggleReaction);
 }

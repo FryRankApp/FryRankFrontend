@@ -19,7 +19,7 @@ export const types = {
     SET_REVIEWS: "SET_REVIEWS",
     SET_FORM_ERROR: "SET_FORM_ERROR",
     DELETE_FORM_ERROR: "DELETE_FORM_ERROR",
-    LIKE_REVIEW_REQUEST: "LIKE_REVIEW_REQUEST",
+    TOGGLE_REACTION_REQUEST: "TOGGLE_REACTION_REQUEST",
     TOGGLE_REACTION_SUCCESS: "TOGGLE_REACTION_SUCCESS",
     TOGGLE_REACTION_FAILURE: "TOGGLE_REACTION_FAILURE",
     SET_TAG_FILTER: "SET_TAG_FILTER"
@@ -260,8 +260,8 @@ export const reviewsActions = {
     setReviews: (reviews) => ({ type: types.SET_REVIEWS, payload: reviews }),
     setFormErrors: (errors) => ({ type: types.SET_FORM_ERROR, errors }),
     deleteFormError: (errorKey) => ({ type: types.DELETE_FORM_ERROR, errorKey }),
-    startLikeReviewRequest: (reviewId, accountId, reactionType, shouldAdd, idToken) => ({
-        type: types.LIKE_REVIEW_REQUEST,
+    startToggleReactionRequest: (reviewId, accountId, reactionType, shouldAdd, idToken) => ({
+        type: types.TOGGLE_REACTION_REQUEST,
         reviewId,
         accountId,
         reactionType,
