@@ -20,6 +20,12 @@ const propTypes = {
     restaurant: PropTypes.object
 };
 
+const REACTION_KEY_BY_TYPE = {
+    THUMBS_UP: "thumbsUp",
+    THUMBS_DOWN: "thumbsDown",
+    HEART: "heart",
+};
+
 const ReviewCard = ({ review, restaurant }) => {
     const dispatch = useDispatch();
     const userAccountId = useSelector((state)=>state.userReducer.userData?.sub);
@@ -45,13 +51,11 @@ const ReviewCard = ({ review, restaurant }) => {
         if (!loggedIn || !idToken) {
             return;
         }
-        const currentlyOn = !!myReactions?.[
-            reactionType === "THUMBS_UP"
-                ? "thumbsUp"
-                : reactionType === "THUMBS_DOWN"
-                    ? "thumbsDown"
-                    : "heart"
-        ];
+        const reactionKey = REACTION_KEY_BY_TYPE[reactionType];
+        if (!reactionKey) {
+            return;
+        }
+        const currentlyOn = !!myReactions?.[reactionKey];
         dispatch(reviewsActions.startLikeReviewRequest(
             displayReview.reviewId,
             displayReview.accountId,
