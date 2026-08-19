@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchRecentReviews } from '../../containers/RecentReviews';
 import { useSelector, useDispatch } from 'react-redux';
 import { FrySpinner, ReviewCardList, Banner, TagFilter } from '../Common';
@@ -12,12 +12,6 @@ const RecentReviews = () => {
     const currentRestaurants = useSelector((state) => state.restaurantsReducer.currentRestaurants);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-
-    // Stable key so likes/edits (new reviews array, same restaurants) do not refetch Place IDs.
-    const restaurantIdsKey = useMemo(() => {
-        if (!recentReviews) return '';
-        return Array.from(new Set(recentReviews.map(review => review.restaurantId).filter(Boolean))).join('|');
-    }, [recentReviews]);
 
     const fetchReviews = useCallback(async () => {
         setLoading(true);
@@ -42,16 +36,16 @@ const RecentReviews = () => {
     }, [fetchReviews]);
 
     useEffect(() => {
-        if (!restaurantIdsKey) {
+        if (!recentReviews) {
             return;
         }
-        const restaurantIds = restaurantIdsKey.split('|');
+        const restaurantIds = Array.from(new Set(recentReviews.map(review => review.restaurantId).filter(Boolean)));
         const missingIds = restaurantIds.filter((id) => !currentRestaurants?.has(id));
         if (missingIds.length === 0) {
             return;
         }
         dispatch(restaurantsActions.startGetRestaurantsForIdsRequest(missingIds));
-    }, [restaurantIdsKey, currentRestaurants, dispatch]);
+    }, [recentReviews, currentRestaurants, dispatch]);
 
     const onTagChange = (tag) => dispatch(reviewsActions.setTagFilter(tag));
 
