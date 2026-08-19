@@ -1,16 +1,23 @@
-import { useState, useEffect, useCallback } from 'react';
-import { fetchRecentReviews, fetchRestaurantDetails } from '../../containers/RecentReviews';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { fetchRecentReviews } from '../../containers/RecentReviews';
 import { useSelector, useDispatch } from 'react-redux';
 import { FrySpinner, ReviewCardList, Banner, TagFilter } from '../Common';
 import { reviewsActions } from '../../redux/reducers/reviews';
+import { restaurantsActions } from '../../redux/reducers/restaurants';
 
 const RecentReviews = () => {
     const dispatch = useDispatch();
     const recentReviews = useSelector((state) => state.reviewsReducer.reviews);
     const selectedTag = useSelector((state) => state.reviewsReducer.tagFilter);
-    const [restaurantData, setRestaurantData] = useState(new Map());
+    const currentRestaurants = useSelector((state) => state.restaurantsReducer.currentRestaurants);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+
+    // Stable key so likes/edits (new reviews array, same restaurants) do not refetch Place IDs.
+    const restaurantIdsKey = useMemo(() => {
+        if (!recentReviews) return '';
+        return Array.from(new Set(recentReviews.map(review => review.restaurantId).filter(Boolean))).join('|');
+    }, [recentReviews]);
 
     const fetchReviews = useCallback(async () => {
         setLoading(true);
@@ -22,6 +29,7 @@ const RecentReviews = () => {
             setLoading(false);
         } catch (error) {
             setError(error.message);
+            setLoading(false);
         }
     }, [dispatch, selectedTag]);
 
@@ -34,22 +42,16 @@ const RecentReviews = () => {
     }, [fetchReviews]);
 
     useEffect(() => {
-        if (recentReviews) {
-            const restaurantIds = Array.from(new Set(recentReviews.map(review => review.restaurantId)));
-            const fetchDetails = async () => {
-                const details = await fetchRestaurantDetails(restaurantIds);
-                let restaurantDict = new Map();
-                details.forEach(detail => {
-                    restaurantDict.set(detail.id, detail);
-                });
-
-                setRestaurantData(restaurantDict);
-                setLoading(false);
-            };
-
-            fetchDetails();
+        if (!restaurantIdsKey) {
+            return;
         }
-    }, [recentReviews]);
+        const restaurantIds = restaurantIdsKey.split('|');
+        const missingIds = restaurantIds.filter((id) => !currentRestaurants?.has(id));
+        if (missingIds.length === 0) {
+            return;
+        }
+        dispatch(restaurantsActions.startGetRestaurantsForIdsRequest(missingIds));
+    }, [restaurantIdsKey, currentRestaurants, dispatch]);
 
     const onTagChange = (tag) => dispatch(reviewsActions.setTagFilter(tag));
 
@@ -66,7 +68,7 @@ const RecentReviews = () => {
         return (
             <ReviewCardList
                 reviews={recentReviews}
-                currentRestaurants={restaurantData} // Pass the restaurantMap to the ReviewCardList
+                currentRestaurants={currentRestaurants}
             />
         );
     };
